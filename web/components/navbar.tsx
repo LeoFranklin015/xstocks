@@ -18,7 +18,7 @@ const navLinks = [
   { label: "Markets", href: "/app/markets" },
   { label: "Vault", href: "/app/vault" },
   { label: "Portfolio", href: "/app/portfolio" },
-  { label: "Docs", href: "https://docs.pendlex.io", external: true },
+  { label: "Docs", href: "https://docs.xstream.io", external: true },
 ];
 
 export default function Navbar() {
@@ -37,13 +37,13 @@ export default function Navbar() {
         <Link href="/" className="flex items-center gap-2">
           <Image
             src="/logo-transparent.png"
-            alt="pendleX logo"
+            alt="xstream logo"
             width={32}
             height={32}
             className="h-8 w-8"
           />
           <span className="text-lg font-semibold tracking-tight text-foreground">
-            pendleX
+            xstream
           </span>
         </Link>
 
@@ -100,11 +100,11 @@ export default function Navbar() {
                   <div className="flex items-center gap-2">
                     <Image
                       src="/logo-transparent.png"
-                      alt="pendleX logo"
+                      alt="xstream logo"
                       width={24}
                       height={24}
                     />
-                    <span className="font-semibold">pendleX</span>
+                    <span className="font-semibold">xstream</span>
                   </div>
                 </SheetTitle>
               </SheetHeader>

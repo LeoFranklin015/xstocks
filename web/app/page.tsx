@@ -96,7 +96,7 @@ const steps = [
   {
     num: "01",
     title: "Deposit xSPY",
-    desc: "Deposit your tokenized S&P 500 ETF (xSPY) into the pendleX vault smart contract.",
+    desc: "Deposit your tokenized S&P 500 ETF (xSPY) into the xstream vault smart contract.",
     icon: Vault,
   },
   {
@@ -218,7 +218,7 @@ export default function Home() {
             transition={{ delay: 0.6, duration: 0.6 }}
             className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground"
           >
-            pendleX splits tokenized ETFs into income tokens and price tokens,
+            xstream splits tokenized ETFs into income tokens and price tokens,
             unlocking predictable yield and clean leveraged exposure -- all
             on-chain, all composable.
           </motion.p>
@@ -237,7 +237,7 @@ export default function Home() {
               <ArrowRight className="ml-1 size-4" />
             </Link>
             <Link
-              href="https://docs.pendlex.io"
+              href="https://docs.xstream.io"
               className={buttonVariants({ variant: "outline", size: "lg" })}
             >
               Read Docs
@@ -330,7 +330,7 @@ export default function Home() {
               <CardContent className="space-y-4">
                 <p className="text-sm leading-relaxed text-muted-foreground">
                   Captures all dividend distributions from the underlying ETF.
-                  Trade 24/7 on the pendleX income market with deep liquidity.
+                  Trade 24/7 on the xstream income market with deep liquidity.
                 </p>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="rounded-lg bg-muted/50 p-3">

@@ -17,7 +17,7 @@ const safiraMarch = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "pendleX Markets - Split. Trade. Earn.",
+  title: "xstream Markets - Split. Trade. Earn.",
   description:
     "Two tokens. Two markets. One vault. Split tokenized ETFs into income and price exposure tokens. Earn predictable yield or trade with clean leverage.",
   icons: {
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   },
   manifest: "/site.webmanifest",
   openGraph: {
-    title: "pendleX Markets - Split. Trade. Earn.",
+    title: "xstream Markets - Split. Trade. Earn.",
     description:
       "Two tokens. Two markets. One vault. DeFi dividend stripping and leveraged day trading.",
     type: "website",
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "pendleX Markets",
+    title: "xstream Markets",
     description:
       "Split tokenized ETFs into income and price tokens. Earn yield or trade with leverage.",
     images: ["/logo-transparent.png"],

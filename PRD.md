@@ -1,4 +1,4 @@
-# pendleX Markets — Product Requirements Document
+# xstream Markets — Product Requirements Document
 
 **Version 1.0 · April 2026 · DRAFT**
 **Status:** Pre-Build / Hackathon Scope
@@ -11,7 +11,7 @@
 
 ## 1. Executive Summary
 
-pendleX Markets is a DeFi protocol that splits tokenized ETFs (xStocks) into two independently tradeable instruments: an income token (xdSPY) representing the dividend stream, and a price exposure token (xpSPY) representing pure price movement. Each token powers its own dedicated market with distinct mechanics, participants, and trading hours.
+xstream Markets is a DeFi protocol that splits tokenized ETFs (xStocks) into two independently tradeable instruments: an income token (xdSPY) representing the dividend stream, and a price exposure token (xpSPY) representing pure price movement. Each token powers its own dedicated market with distinct mechanics, participants, and trading hours.
 
 The protocol introduces a novel financial primitive — on-chain dividend stripping — that has no existing equivalent in DeFi. TradFi has STRIPS bonds and equity futures, but nobody has combined yield separation, leveraged day trading, and atomic recombination in a single permissionless vault.
 
@@ -347,7 +347,7 @@ State transitions are triggered by the session oracle (keeper or Chainlink). The
 
 No existing DeFi protocol combines all four of these primitives:
 
-| Feature | TradFi | Existing DeFi | pendleX | Closest Analog |
+| Feature | TradFi | Existing DeFi | xstream | Closest Analog |
 |---|---|---|---|---|
 | Yield stripping | STRIPS bonds | **None** | **xdSPY** | Pendle (yield tokens) |
 | Pure price exposure | Equity futures | Perps | **xpSPY** | dYdX / GMX perps |
