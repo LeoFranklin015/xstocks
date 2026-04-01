@@ -155,25 +155,21 @@ export default function CandlestickChart({
     };
   }, []);
 
-  // Update data -- use setData only on full reload, update() for live ticks
+  // Update data -- always use setData to avoid "cannot update oldest data" errors
   const prevLenRef = useRef(0);
   useEffect(() => {
     if (!candleSeriesRef.current || !volumeSeriesRef.current || data.length === 0) return;
 
-    const isFullReload = Math.abs(data.length - prevLenRef.current) > 1 || prevLenRef.current === 0;
+    const isFirstLoad = prevLenRef.current === 0;
     prevLenRef.current = data.length;
 
-    if (isFullReload) {
-      candleSeriesRef.current.setData(toChartData(data));
-      volumeSeriesRef.current.setData(toVolumeData(data));
+    // Sort ascending by time to guarantee chart never gets out-of-order bars
+    const sorted = [...data].sort((a, b) => Number(a.time) - Number(b.time));
+    candleSeriesRef.current.setData(toChartData(sorted));
+    volumeSeriesRef.current.setData(toVolumeData(sorted));
+
+    if (isFirstLoad) {
       chartRef.current?.timeScale().fitContent();
-    } else {
-      // Just update the last candle
-      const last = data[data.length - 1];
-      const chartBar = { time: Number(last.time) as Time, open: last.open, high: last.high, low: last.low, close: last.close };
-      const volBar = { time: Number(last.time) as Time, value: last.volume, color: last.close >= last.open ? "rgba(200,255,0,0.12)" : "rgba(255,68,68,0.12)" };
-      candleSeriesRef.current.update(chartBar);
-      volumeSeriesRef.current.update(volBar);
     }
   }, [data]);
 

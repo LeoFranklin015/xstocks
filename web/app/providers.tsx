@@ -1,36 +1,7 @@
 "use client";
 
 import { PrivyProvider } from "@privy-io/react-auth";
-import { ReactLenis } from "lenis/react";
-import { usePathname } from "next/navigation";
-import LenisMotionRaf from "@/components/landing/LenisMotionRaf";
-
-function SmoothScroll({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const isAppRoute = pathname.startsWith("/app");
-
-  // Lenis root mode hijacks scroll on <html>, which breaks nested
-  // overflow-y-auto containers like the app layout's <main>.
-  // Only enable it for the marketing/landing pages.
-  if (isAppRoute) {
-    return <>{children}</>;
-  }
-
-  return (
-    <ReactLenis
-      root
-      options={{
-        lerp: 0.1,
-        duration: 1.2,
-        smoothWheel: true,
-        autoRaf: false,
-      }}
-    >
-      <LenisMotionRaf />
-      {children}
-    </ReactLenis>
-  );
-}
+import { sepolia, inkSepolia } from "viem/chains";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -43,6 +14,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           logo: "/logo-transparent.png",
         },
         loginMethods: ["wallet", "email"],
+        defaultChain: inkSepolia,
+        supportedChains: [inkSepolia, sepolia],
         embeddedWallets: {
           ethereum: {
             createOnLogin: "users-without-wallets",
@@ -50,7 +23,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         },
       }}
     >
-      <SmoothScroll>{children}</SmoothScroll>
+      {children}
     </PrivyProvider>
   );
 }

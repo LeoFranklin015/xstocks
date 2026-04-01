@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Card,
   CardContent,
@@ -27,6 +27,7 @@ import {
   CalendarClock,
   Info,
 } from "lucide-react";
+import { useAppMode } from "@/lib/mode-context";
 
 const vaultStats = {
   tvl: "$2,420,000",
@@ -186,7 +187,61 @@ function WithdrawTab() {
   );
 }
 
-export default function VaultPage() {
+const howItWorksSteps = [
+  {
+    step: "1",
+    title: "Deposit xSPY",
+    desc: "Send your tokenized ETF into the vault. xSPY represents a real stock/ETF on-chain.",
+  },
+  {
+    step: "2",
+    title: "Receive dx + px",
+    desc: "The vault mints equal amounts of xdSPY (income) and xpSPY (price exposure) 1:1.",
+  },
+  {
+    step: "3",
+    title: "Earn & Trade",
+    desc: "xdSPY accrues dividends and borrow fees. xpSPY gives leveraged price exposure during NYSE hours.",
+  },
+  {
+    step: "4",
+    title: "Recombine Anytime",
+    desc: "Return equal amounts of xdSPY + xpSPY to withdraw your original xSPY back.",
+  },
+];
+
+function HowItWorks() {
+  return (
+    <motion.div {...fadeUp} transition={{ delay: 0.02 }}>
+      <Card>
+        <CardHeader className="px-4 pt-4 pb-2">
+          <CardTitle className="text-sm font-medium">How the Vault Works</CardTitle>
+        </CardHeader>
+        <CardContent className="px-4 pb-4 pt-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {howItWorksSteps.map((s, i) => (
+              <div key={s.step} className="relative flex flex-col gap-2">
+                {/* connector line */}
+                {i < howItWorksSteps.length - 1 && (
+                  <div className="hidden lg:block absolute top-4 left-[calc(100%_-_8px)] w-4 h-px bg-border/60 z-0" />
+                )}
+                <div className="flex items-center gap-2">
+                  <div className="size-7 rounded-full bg-[#c8ff00]/10 border border-[#c8ff00]/20 flex items-center justify-center shrink-0 z-10">
+                    <span className="text-[11px] font-semibold text-[#c8ff00]">{s.step}</span>
+                  </div>
+                  <p className="text-sm font-medium">{s.title}</p>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed pl-9">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+}
+
+function ExpertVault() {
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-5xl mx-auto">
       <motion.div {...fadeUp}>
@@ -197,6 +252,8 @@ export default function VaultPage() {
           Deposit xSPY to mint income and price exposure tokens.
         </p>
       </motion.div>
+
+      <HowItWorks />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main deposit/withdraw */}
@@ -324,5 +381,158 @@ export default function VaultPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function GrandmaVault() {
+  const [depositAmount, setDepositAmount] = useState("");
+  const [withdrawAmount, setWithdrawAmount] = useState("");
+  const depositNum = parseFloat(depositAmount) || 0;
+  const withdrawNum = parseFloat(withdrawAmount) || 0;
+
+  return (
+    <div className="p-4 md:p-6 space-y-6 max-w-2xl mx-auto">
+      <motion.div {...fadeUp}>
+        <h1 className="font-[family-name:var(--font-safira)] text-2xl md:text-3xl tracking-tight">
+          Your Savings Vault
+        </h1>
+        <p className="text-muted-foreground text-sm mt-1">
+          Put your money to work and earn regular income.
+        </p>
+      </motion.div>
+
+      {/* Explanation */}
+      <motion.div {...fadeUp} transition={{ delay: 0.05 }}>
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { icon: "1", title: "Put money in", desc: "Deposit your xSPY tokens" },
+            { icon: "2", title: "Vault splits it", desc: "You get Income + Price tokens" },
+            { icon: "3", title: "Earn payments", desc: "Income token pays out regularly" },
+            { icon: "4", title: "Take money out", desc: "Return both tokens to get xSPY back" },
+          ].map((s) => (
+            <Card key={s.icon} className="bg-[#0a0a0a]">
+              <CardContent className="p-4">
+                <div className="size-8 rounded-full bg-[#c8ff00]/10 flex items-center justify-center mb-2">
+                  <span className="text-xs font-bold text-[#c8ff00]">{s.icon}</span>
+                </div>
+                <p className="text-sm font-medium">{s.title}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{s.desc}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Put Money In */}
+      <motion.div {...fadeUp} transition={{ delay: 0.1 }}>
+        <Card className="border-[#c8ff00]/20">
+          <CardHeader className="px-5 pt-5 pb-3">
+            <CardTitle className="text-base font-medium flex items-center gap-2">
+              <ArrowDownToLine className="size-5 text-[#c8ff00]" />
+              Put Money In
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="px-5 pb-5 pt-0 space-y-3">
+            <div>
+              <label className="text-sm text-muted-foreground mb-1.5 block">
+                How much do you want to deposit?
+              </label>
+              <Input
+                type="number"
+                placeholder="0.00"
+                value={depositAmount}
+                onChange={(e) => setDepositAmount(e.target.value)}
+                className="h-12 text-lg"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Available: 1,250.00 xSPY
+              </p>
+            </div>
+            <Button
+              className="w-full h-11 bg-[#c8ff00] text-[#0a0a0a] hover:bg-[#c8ff00]/80 font-medium text-sm"
+              disabled={depositNum <= 0}
+            >
+              Deposit
+            </Button>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Take Money Out */}
+      <motion.div {...fadeUp} transition={{ delay: 0.15 }}>
+        <Card>
+          <CardHeader className="px-5 pt-5 pb-3">
+            <CardTitle className="text-base font-medium flex items-center gap-2">
+              <ArrowUpFromLine className="size-5 text-muted-foreground" />
+              Take Money Out
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="px-5 pb-5 pt-0 space-y-3">
+            <div>
+              <label className="text-sm text-muted-foreground mb-1.5 block">
+                How much do you want to withdraw?
+              </label>
+              <Input
+                type="number"
+                placeholder="0.00"
+                value={withdrawAmount}
+                onChange={(e) => setWithdrawAmount(e.target.value)}
+                className="h-12 text-lg"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                In vault: 625.00
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              className="w-full h-11 font-medium text-sm"
+              disabled={withdrawNum <= 0}
+            >
+              Withdraw
+            </Button>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Earnings */}
+      <motion.div {...fadeUp} transition={{ delay: 0.2 }}>
+        <Card className="border-[#c8ff00]/20">
+          <CardContent className="p-5 text-center space-y-3">
+            <Gift className="size-8 text-[#c8ff00] mx-auto" />
+            <div>
+              <p className="text-sm text-muted-foreground">Your Earnings</p>
+              <p className="text-3xl font-semibold text-[#c8ff00] font-mono tracking-tight mt-1">
+                $8.22
+              </p>
+            </div>
+            <Button className="w-full bg-[#c8ff00] text-[#0a0a0a] hover:bg-[#c8ff00]/80 font-medium">
+              <Gift className="size-4 mr-2" />
+              Collect Earnings
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              Next payment expected: Apr 15, 2026
+            </p>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
+  );
+}
+
+export default function VaultPage() {
+  const { mode } = useAppMode();
+
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={mode}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        {mode === "expert" ? <ExpertVault /> : <GrandmaVault />}
+      </motion.div>
+    </AnimatePresence>
   );
 }

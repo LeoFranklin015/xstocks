@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { motion, useInView } from "framer-motion";
 import {
@@ -15,6 +15,8 @@ import {
   Layers,
   Target,
   Repeat,
+  ChevronDown,
+  HelpCircle,
 } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,6 +25,7 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import LiquidEther from "@/components/LiquidEther";
 import HeroSplitVisual from "@/components/landing/HeroSplitVisual";
+import CoreTechnology from "@/components/landing/CoreTechnology";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -112,6 +115,86 @@ const stats = [
   { label: "px exchange", value: "NYSE hours" },
   { label: "Price oracle", value: "Pyth" },
 ];
+
+const faqs = [
+  {
+    q: "What are dx and px tokens?",
+    a: "When you deposit an xStock into the vault, it mints two tokens: dx (dividend token) captures all dividend rebases and trades 24/7, while px (principal token) gives you leveraged price exposure during NYSE trading hours. Together they always equal one xStock.",
+  },
+  {
+    q: "How do I get started?",
+    a: "Connect your wallet, deposit a supported xStock (like AAPL, ABT, or SPY) into the vault, and receive your dx and px tokens. You can then hold for yield, trade on the exchange, or recombine anytime to withdraw the underlying.",
+  },
+  {
+    q: "When can I trade px tokens?",
+    a: "px tokens trade against USDC only during NYSE market hours (Monday-Friday, 9:30 AM - 4:00 PM ET). This session-gating ensures price exposure aligns with the underlying equity market. dx tokens trade 24/7 with no session restrictions.",
+  },
+  {
+    q: "What happens to dividends?",
+    a: "Dividends flow through the vault's accumulator system exclusively to dx holders. px holders receive zero dividend exposure -- that is the entire point of the split. This lets income investors isolate yield from price volatility.",
+  },
+  {
+    q: "Can I recombine dx + px back into xStock?",
+    a: "Yes. Burn equal amounts of dx and px tokens to redeem the underlying xStock at any time. A small recombination fee (0.05%) applies. Arbitrageurs keep the dx + px bundle priced close to the underlying.",
+  },
+  {
+    q: "What oracle powers the price feed?",
+    a: "xStream uses Pyth Network for real-time price data. Pyth provides low-latency, high-fidelity price feeds sourced directly from institutional market makers, ensuring accurate mark-to-market for px positions.",
+  },
+  {
+    q: "What are the fees?",
+    a: "Mint/burn: 0.05% of notional. Session settlement: 0.1% of notional. Borrowing: 0.01% per hour of borrowed notional. 80% of all protocol fees flow to dx holders as additional yield; 20% goes to the protocol treasury.",
+  },
+  {
+    q: "Is the protocol audited?",
+    a: "Smart contracts are currently undergoing audit. The protocol is live on testnet for community testing. Always treat DeFi protocols as experimental software and never deposit more than you can afford to lose.",
+  },
+];
+
+// ---------------------------------------------------------------------------
+// FAQ Accordion Item
+// ---------------------------------------------------------------------------
+
+function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ delay: index * 0.06, duration: 0.4 }}
+      className="border-b border-white/[0.06] last:border-b-0"
+    >
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center justify-between gap-4 py-5 text-left group"
+      >
+        <span className="text-sm font-medium text-foreground sm:text-base group-hover:text-[#c8ff00] transition-colors">
+          {q}
+        </span>
+        <ChevronDown
+          className={`size-4 shrink-0 text-muted-foreground transition-transform duration-200 ${
+            open ? "rotate-180 text-[#c8ff00]" : ""
+          }`}
+        />
+      </button>
+      <motion.div
+        initial={false}
+        animate={{
+          height: open ? "auto" : 0,
+          opacity: open ? 1 : 0,
+        }}
+        transition={{ duration: 0.25, ease: "easeOut" }}
+        className="overflow-hidden"
+      >
+        <p className="pb-5 text-sm leading-relaxed text-muted-foreground">
+          {a}
+        </p>
+      </motion.div>
+    </motion.div>
+  );
+}
 
 // ---------------------------------------------------------------------------
 // Page
@@ -271,6 +354,11 @@ export default function Home() {
           })}
         </div>
       </Section>
+
+      {/* ----------------------------------------------------------------- */}
+      {/* Core Technology                                                   */}
+      {/* ----------------------------------------------------------------- */}
+      <CoreTechnology />
 
       {/* ----------------------------------------------------------------- */}
       {/* Token Architecture                                                */}
@@ -459,6 +547,35 @@ export default function Home() {
               <p className="mt-2 text-sm text-muted-foreground">{s.label}</p>
             </motion.div>
           ))}
+        </div>
+      </Section>
+
+      {/* ----------------------------------------------------------------- */}
+      {/* FAQ                                                               */}
+      {/* ----------------------------------------------------------------- */}
+      <Section className="mx-auto w-full max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+        <div className="grid gap-12 lg:grid-cols-[1fr_1.5fr] lg:gap-16">
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="flex size-8 items-center justify-center rounded-lg bg-[#c8ff00]/10">
+                <HelpCircle className="size-4 text-[#c8ff00]" />
+              </div>
+              <Badge variant="secondary">FAQ</Badge>
+            </div>
+            <h2 className="font-[family-name:var(--font-safira)] text-3xl sm:text-4xl">
+              Frequently asked questions
+            </h2>
+            <p className="mt-4 text-sm leading-relaxed text-muted-foreground max-w-sm">
+              Everything you need to know about the xStream protocol, dx/px
+              tokens, and how to get started.
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-white/[0.06] bg-card/40 px-6">
+            {faqs.map((faq, i) => (
+              <FaqItem key={faq.q} q={faq.q} a={faq.a} index={i} />
+            ))}
+          </div>
         </div>
       </Section>
 

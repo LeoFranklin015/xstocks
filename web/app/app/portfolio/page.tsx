@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Card,
   CardContent,
@@ -27,6 +27,7 @@ import {
   Tooltip as RechartsTooltip,
   CartesianGrid,
 } from "recharts";
+import { useAppMode } from "@/lib/mode-context";
 
 // Mock portfolio value over time
 const portfolioData = Array.from({ length: 60 }, (_, i) => {
@@ -126,7 +127,7 @@ const fadeUp = {
   animate: { opacity: 1, y: 0 },
 };
 
-export default function PortfolioPage() {
+function ExpertPortfolio() {
   const totalValue = "$51,032.50";
   const pendingDividends = "$8.22";
 
@@ -444,5 +445,107 @@ export default function PortfolioPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function GrandmaPortfolio() {
+  const totalValue = "$51,032.50";
+  const pendingDividends = "$8.22";
+
+  const simpleBalances = [
+    { label: "Income Tokens", symbol: "xdSPY", value: "$800.00", balance: "625.00" },
+    { label: "Price Tokens", symbol: "xpSPY", value: "$32,812.50", balance: "625.00" },
+    { label: "Investments", symbol: "xSPY", value: "$12,420.00", balance: "250.00" },
+    { label: "Cash Balance", symbol: "USDC", value: "$5,000.00", balance: "5,000.00" },
+  ];
+
+  return (
+    <div className="p-4 md:p-6 space-y-6 max-w-2xl mx-auto">
+      <motion.div {...fadeUp}>
+        <h1 className="font-[family-name:var(--font-safira)] text-2xl md:text-3xl tracking-tight">
+          Your Holdings
+        </h1>
+        <p className="text-muted-foreground text-sm mt-1">
+          Everything you own in one place.
+        </p>
+      </motion.div>
+
+      {/* Big total value */}
+      <motion.div {...fadeUp} transition={{ delay: 0.05 }}>
+        <Card className="border-[#c8ff00]/20">
+          <CardContent className="p-6 text-center">
+            <p className="text-sm text-muted-foreground mb-2">Total Value</p>
+            <p className="text-4xl font-semibold tracking-tight">{totalValue}</p>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Simple balance list */}
+      <motion.div {...fadeUp} transition={{ delay: 0.1 }}>
+        <Card>
+          <CardContent className="p-0">
+            {simpleBalances.map((item, i) => (
+              <div key={item.symbol}>
+                {i > 0 && <Separator className="opacity-30" />}
+                <div className="flex items-center justify-between px-5 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="size-9 rounded-full bg-[#c8ff00]/10 flex items-center justify-center">
+                      <Coins className="size-4 text-[#c8ff00]" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{item.label}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {item.balance} {item.symbol}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-sm font-semibold font-mono">{item.value}</p>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Earnings claim */}
+      <motion.div {...fadeUp} transition={{ delay: 0.15 }}>
+        <Card className="border-[#c8ff00]/20">
+          <CardContent className="p-6 text-center space-y-3">
+            <Gift className="size-8 text-[#c8ff00] mx-auto" />
+            <div>
+              <p className="text-sm text-muted-foreground">Earnings Ready to Collect</p>
+              <p className="text-3xl font-semibold text-[#c8ff00] font-mono tracking-tight mt-1">
+                {pendingDividends}
+              </p>
+            </div>
+            <Button className="w-full bg-[#c8ff00] text-[#0a0a0a] hover:bg-[#c8ff00]/80 font-medium">
+              <Gift className="size-4 mr-2" />
+              Collect Earnings
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              Next payment expected: Apr 15, 2026
+            </p>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
+  );
+}
+
+export default function PortfolioPage() {
+  const { mode } = useAppMode();
+
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={mode}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        {mode === "expert" ? <ExpertPortfolio /> : <GrandmaPortfolio />}
+      </motion.div>
+    </AnimatePresence>
   );
 }
