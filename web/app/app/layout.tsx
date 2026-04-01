@@ -12,6 +12,7 @@ import {
   Briefcase,
   Presentation,
   BookOpen,
+  Gavel,
   Menu,
   Circle,
 } from "lucide-react";
@@ -32,6 +33,7 @@ const navLinks = [
   { href: "/app", label: "Dashboard", icon: LayoutDashboard },
   { href: "/app/vault", label: "Vault", icon: Vault },
   { href: "/app/markets", label: "Markets", icon: BarChart3 },
+  { href: "/app/auction", label: "Auction", icon: Gavel },
   { href: "/app/portfolio", label: "Portfolio", icon: Briefcase },
   { href: "/pitch", label: "Pitch", icon: Presentation },
   { href: "/docs", label: "Docs", icon: BookOpen },
