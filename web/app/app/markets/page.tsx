@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -16,8 +16,35 @@ import {
   Star,
   Circle,
 } from "lucide-react";
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+} from "recharts";
 import { type Asset } from "@/lib/market-data";
 import { usePythPrices } from "@/lib/use-pyth-prices";
+import { usePythSparklines } from "@/lib/use-pyth-sparklines";
+
+function useInView() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [seen, setSeen] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setSeen(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  return { ref, seen };
+}
 
 const filterOptions = ["All assets", "Stock", "ETF"];
 const sortOptions = ["Name", "Price: High", "Price: Low", "24H Change"];
@@ -182,56 +209,73 @@ function AllAssetsList({ assets }: { assets: Asset[] }) {
 
 // ---- Asset Card ----
 
-function AssetCard({ asset }: { asset: Asset }) {
+function AssetCard({ asset, sparkline }: { asset: Asset; sparkline?: { v: number }[] }) {
   const positive = asset.change >= 0;
   const loading = asset.price === 0;
+  const { ref, seen } = useInView();
+  const strokeColor = positive ? "#c8ff00" : "#ff4444";
+  const bgColor = positive ? "rgba(200, 255, 0, 0.06)" : "rgba(255, 68, 68, 0.06)";
+  const gradientId = `grad-${asset.ticker}`;
 
   return (
     <Link href={`/app/markets/${asset.ticker}`}>
-      <Card className="overflow-hidden hover:ring-foreground/20 transition-all cursor-pointer group">
-        <div className="px-4 pt-4 pb-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <LogoIcon asset={asset} />
-            <div>
-              <p className="text-sm font-medium text-foreground">{asset.ticker}</p>
-              <p className="text-xs text-muted-foreground">{asset.name}</p>
-            </div>
+      <Card ref={ref} className="overflow-hidden hover:ring-foreground/20 transition-all cursor-pointer group">
+        <div className="px-4 pt-4 pb-2 flex items-center gap-3">
+          <LogoIcon asset={asset} />
+          <div>
+            <p className="text-sm font-medium text-foreground">{asset.ticker}</p>
+            <p className="text-xs text-muted-foreground">{asset.name}</p>
           </div>
-          <Badge variant="secondary" className="text-[10px]">
-            {asset.type}
-          </Badge>
         </div>
 
-        <div className="px-4 pb-4">
-          {loading ? (
-            <div className="h-16 flex items-center">
-              <div className="h-3 w-24 bg-muted/50 rounded animate-pulse" />
-            </div>
-          ) : (
-            <>
-              <p className="text-2xl font-semibold text-foreground tracking-tight">
-                ${asset.price.toFixed(2)}
-              </p>
-              <div className="flex items-center gap-2 mt-1">
-                <span
-                  className={`text-xs font-mono ${
-                    positive ? "text-[#c8ff00]" : "text-red-500"
-                  }`}
-                >
+        <div className="mx-3 mb-3 rounded-lg overflow-hidden" style={{ backgroundColor: bgColor }}>
+          <div className="px-4 pt-3">
+            {loading ? (
+              <div className="h-12 flex items-center">
+                <div className="h-3 w-24 bg-muted/50 rounded animate-pulse" />
+              </div>
+            ) : (
+              <>
+                <p className="text-2xl font-semibold text-foreground tracking-tight">
+                  ${asset.price.toFixed(2)}
+                </p>
+                <p className={`text-xs font-mono mt-0.5 tracking-wide ${positive ? "text-[#c8ff00]" : "text-red-500"}`}>
                   {positive ? (
                     <TrendingUp className="size-3 inline mr-0.5" />
                   ) : (
                     <TrendingDown className="size-3 inline mr-0.5" />
                   )}
-                  ${Math.abs(asset.change).toFixed(2)} (
-                  {positive ? "+" : ""}
-                  {asset.changePercent.toFixed(2)}%)
-                </span>
-                <Circle className="size-1 fill-[#c8ff00] text-[#c8ff00]" />
-                <span className="text-[10px] text-muted-foreground">Pyth Live</span>
-              </div>
-            </>
-          )}
+                  ${Math.abs(asset.change).toFixed(2)} ({positive ? "+" : ""}{asset.changePercent.toFixed(2)}%) 24H
+                </p>
+              </>
+            )}
+          </div>
+
+          <div className="h-[100px] mt-1">
+            {seen && sparkline && sparkline.length > 0 && (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={sparkline} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={strokeColor} stopOpacity={0.25} />
+                      <stop offset="100%" stopColor={strokeColor} stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <Area
+                    type="monotone"
+                    dataKey="v"
+                    stroke={strokeColor}
+                    strokeWidth={2}
+                    fill={`url(#${gradientId})`}
+                    dot={false}
+                    isAnimationActive={true}
+                    animationDuration={1500}
+                    animationEasing="ease-in-out"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
+          </div>
         </div>
       </Card>
     </Link>
@@ -240,13 +284,14 @@ function AssetCard({ asset }: { asset: Asset }) {
 
 // ---- Asset List Row ----
 
-function AssetRow({ asset }: { asset: Asset }) {
+function AssetRow({ asset, sparkline }: { asset: Asset; sparkline?: { v: number }[] }) {
   const positive = asset.change >= 0;
   const loading = asset.price === 0;
+  const { ref, seen } = useInView();
 
   return (
     <Link href={`/app/markets/${asset.ticker}`}>
-      <div className="flex items-center justify-between py-3 px-4 border-b border-border/50 last:border-0 hover:bg-muted/30 transition-colors cursor-pointer">
+      <div ref={ref} className="flex items-center justify-between py-3 px-4 border-b border-border/50 last:border-0 hover:bg-muted/30 transition-colors cursor-pointer">
         <div className="flex items-center gap-3 min-w-0">
           <LogoIcon asset={asset} />
           <div className="min-w-0">
@@ -260,24 +305,41 @@ function AssetRow({ asset }: { asset: Asset }) {
           </div>
         </div>
 
-        <div className="text-right min-w-[120px]">
-          {loading ? (
-            <div className="h-3 w-20 bg-muted/50 rounded animate-pulse ml-auto" />
-          ) : (
-            <>
-              <p className="text-sm font-medium text-foreground">
-                ${asset.price.toFixed(2)}
-              </p>
-              <p
-                className={`text-xs font-mono ${
-                  positive ? "text-[#c8ff00]" : "text-red-500"
-                }`}
-              >
-                {positive ? "+" : ""}
-                {asset.changePercent.toFixed(2)}%
-              </p>
-            </>
-          )}
+        <div className="flex items-center gap-6">
+          <div className="w-[100px] h-[40px] hidden sm:block">
+            {seen && sparkline && sparkline.length > 0 && (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={sparkline} margin={{ top: 2, right: 0, left: 0, bottom: 2 }}>
+                  <Area
+                    type="monotone"
+                    dataKey="v"
+                    stroke={positive ? "#c8ff00" : "#ff4444"}
+                    strokeWidth={1.5}
+                    fill="transparent"
+                    dot={false}
+                    isAnimationActive={true}
+                    animationDuration={1200}
+                    animationEasing="ease-in-out"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
+          </div>
+
+          <div className="text-right min-w-[100px]">
+            {loading ? (
+              <div className="h-3 w-20 bg-muted/50 rounded animate-pulse ml-auto" />
+            ) : (
+              <>
+                <p className="text-sm font-medium text-foreground">
+                  ${asset.price.toFixed(2)}
+                </p>
+                <p className={`text-xs font-mono ${positive ? "text-[#c8ff00]" : "text-red-500"}`}>
+                  {positive ? "+" : ""}{asset.changePercent.toFixed(2)}%
+                </p>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </Link>
@@ -288,6 +350,7 @@ function AssetRow({ asset }: { asset: Asset }) {
 
 export default function MarketsPage() {
   const assets = usePythPrices();
+  const sparklines = usePythSparklines();
   const [search, setSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState("All assets");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -468,7 +531,7 @@ export default function MarketsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.03 }}
               >
-                <AssetCard asset={asset} />
+                <AssetCard asset={asset} sparkline={sparklines[asset.ticker]} />
               </motion.div>
             ))}
           </div>
@@ -481,7 +544,7 @@ export default function MarketsPage() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: i * 0.02 }}
               >
-                <AssetRow asset={asset} />
+                <AssetRow asset={asset} sparkline={sparklines[asset.ticker]} />
               </motion.div>
             ))}
           </Card>

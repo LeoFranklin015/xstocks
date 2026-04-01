@@ -69,14 +69,20 @@ export function usePythCandles(
           volume: data.v[i] || 0,
         }));
 
-        // Filter out stale bars from market-closed periods:
-        // remove bars where open == high == low == close (no movement)
-        // and remove bars that are exact duplicates of the previous bar's close
-        const bars = raw.filter((bar, i) => {
-          const flat = bar.open === bar.high && bar.high === bar.low && bar.low === bar.close;
-          if (flat && i > 0 && bar.close === raw[i - 1].close) return false;
-          return true;
-        });
+        // For intraday, filter to NYSE regular hours only (13:30-20:00 UTC / 9:30-4:00 ET)
+        // This removes pre-market, post-market, and overnight bars that create visual gaps
+        const isIntraday = ["1m", "5m", "15m", "1h", "4h"].includes(timeframe);
+        const bars = isIntraday
+          ? raw.filter((bar) => {
+              const d = new Date(Number(bar.time) * 1000);
+              const utcH = d.getUTCHours();
+              const utcM = d.getUTCMinutes();
+              const mins = utcH * 60 + utcM;
+              const day = d.getUTCDay();
+              // NYSE: Mon-Fri 13:30-20:00 UTC (810-1200 mins)
+              return day >= 1 && day <= 5 && mins >= 810 && mins < 1200;
+            })
+          : raw;
 
         setCandles(bars);
         if (bars.length > 0) {
