@@ -1,4 +1,4 @@
-pendlex
+xstream
 
 
 Create a new directory called 'web' for the front end. 

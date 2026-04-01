@@ -1,4 +1,4 @@
-export const APP_NAME = "pendleX";
+export const APP_NAME = "xstream";
 
 // Token definitions
 export const TOKENS = {

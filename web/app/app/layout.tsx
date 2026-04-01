@@ -11,6 +11,8 @@ import {
   Vault,
   BarChart3,
   Briefcase,
+  Presentation,
+  BookOpen,
   Menu,
   Circle,
 } from "lucide-react";
@@ -30,6 +32,8 @@ const navLinks = [
   { href: "/app/vault", label: "Vault", icon: Vault },
   { href: "/app/markets", label: "Markets", icon: BarChart3 },
   { href: "/app/portfolio", label: "Portfolio", icon: Briefcase },
+  { href: "/pitch", label: "Pitch", icon: Presentation },
+  { href: "/docs", label: "Docs", icon: BookOpen },
 ];
 
 function useSessionStatus() {
@@ -97,12 +101,12 @@ function SidebarContent({ pathname }: { pathname: string }) {
         <Link href="/app" className="flex items-center gap-2">
           <Image
             src="/logo-transparent.png"
-            alt="pendleX"
+            alt="xstream"
             width={32}
             height={32}
           />
           <span className="font-[family-name:var(--font-safira)] text-lg tracking-tight">
-            pendle<span className="text-[#c8ff00]">X</span>
+            x<span className="text-[#c8ff00]">stream</span>
           </span>
         </Link>
       </div>
@@ -122,8 +126,8 @@ function SidebarContent({ pathname }: { pathname: string }) {
       </nav>
       <div className="p-4 pt-2">
         <div className="rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground">
-          <p className="font-medium text-foreground mb-1">pendleX Markets</p>
-          <p>Split. Trade. Earn.</p>
+          <p className="font-medium text-foreground mb-1">xstream Markets</p>
+          <p>dx yield, px price, one vault.</p>
         </div>
       </div>
     </div>

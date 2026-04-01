@@ -14,7 +14,7 @@ const columns = [
   {
     title: "Resources",
     links: [
-      { label: "Documentation", href: "https://docs.pendlex.io" },
+      { label: "Documentation", href: "/docs" },
       { label: "Whitepaper", href: "/whitepaper" },
       { label: "Audit Reports", href: "/audits" },
       { label: "Brand Kit", href: "/brand" },
@@ -23,10 +23,10 @@ const columns = [
   {
     title: "Community",
     links: [
-      { label: "Twitter", href: "https://twitter.com/pendlex" },
-      { label: "Discord", href: "https://discord.gg/pendlex" },
-      { label: "Telegram", href: "https://t.me/pendlex" },
-      { label: "GitHub", href: "https://github.com/pendlex" },
+      { label: "Twitter", href: "https://twitter.com/xstream" },
+      { label: "Discord", href: "https://discord.gg/xstream" },
+      { label: "Telegram", href: "https://t.me/xstream" },
+      { label: "GitHub", href: "https://github.com/xstream" },
     ],
   },
 ];
@@ -41,13 +41,13 @@ export default function Footer() {
             <Link href="/" className="flex items-center gap-2">
               <Image
                 src="/logo-transparent.png"
-                alt="pendleX logo"
+                alt="xstream logo"
                 width={28}
                 height={28}
                 className="h-7 w-7"
               />
               <span className="text-base font-semibold tracking-tight text-foreground">
-                pendleX
+                xstream
               </span>
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
@@ -81,7 +81,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 sm:flex-row">
           <p className="text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} pendleX Markets. All rights
+            &copy; {new Date().getFullYear()} xstream Markets. All rights
             reserved.
           </p>
           <div className="flex gap-6">
