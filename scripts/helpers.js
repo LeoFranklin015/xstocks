@@ -86,31 +86,26 @@ export const KEEPER_ABI = [
   "function getKeeperStatus(address) view returns (bool)",
 ];
 
-export const MOCK_PYTH_ABI = [
-  "function createPriceFeedUpdateData(bytes32,int64,uint64,int32,int64,uint64,uint64) pure returns (bytes)",
-  "function getUpdateFee(bytes[]) view returns (uint256)",
-  "function updatePriceFeeds(bytes[]) payable",
-];
-
 export const PYTH_ADAPTER_ABI = [
   "function getPrice(bytes32,bytes[]) payable returns (uint256,uint256)",
   "function getUpdateFee(bytes[]) view returns (uint256)",
   "function maxStaleness() view returns (uint256)",
 ];
 
-// Create a Pyth price update for one feed
-export async function createPriceUpdate(mockPyth, feedId, price) {
-  const ts = Math.floor(Date.now() / 1000);
-  const data = await mockPyth.createPriceFeedUpdateData(
-    feedId,
-    BigInt(price),   // price
-    100n,            // conf
-    -2,              // expo
-    BigInt(price),   // emaPrice
-    100n,            // emaConf
-    BigInt(ts)       // publishTime
-  );
-  return [data];
+// Fetch latest Pyth price update data from Hermes for one or more feed IDs.
+// Returns an array of hex-encoded VAA bytes to pass as updateData to the exchange.
+export async function fetchHermesUpdate(feedIds) {
+  const ids = Array.isArray(feedIds) ? feedIds : [feedIds];
+  const params = ids.map(id => `ids[]=${id}`).join("&");
+  const url = `https://hermes.pyth.network/v2/updates/price/latest?${params}`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Hermes fetch failed (${res.status}): ${body}`);
+  }
+  const json = await res.json();
+  // binary.data entries are hex strings without 0x prefix
+  return json.binary.data.map(d => "0x" + d);
 }
 
 // Get pyth update fee

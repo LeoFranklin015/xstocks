@@ -1,30 +1,30 @@
-// Flow 2: Open long and short positions, then close them
+// Flow 2: Open long and short positions using real Pyth prices, then close them.
+// Price moves are replaced by fresh Hermes fetches; PnL reflects actual market movement.
 import { ethers } from "ethers";
 import { CONTRACTS, TOKENS } from "../config.js";
 import {
   getDeployer, getWallet, header, log, fmtUsdc, parseUsdc,
-  ERC20_ABI, EXCHANGE_ABI, MOCK_PYTH_ABI,
-  createPriceUpdate, extractPositionId,
+  ERC20_ABI, EXCHANGE_ABI, PYTH_ADAPTER_ABI,
+  fetchHermesUpdate, extractPositionId,
 } from "../helpers.js";
 
-async function priceData(mockPyth, feedId, price) {
-  const updates = await createPriceUpdate(mockPyth, feedId, price);
-  const fee = await mockPyth.getUpdateFee(updates);
+async function hermesData(pythAdapter, feedId) {
+  const updates = await fetchHermesUpdate([feedId]);
+  const fee     = await pythAdapter.getUpdateFee(updates);
   return { updates, fee };
 }
 
 async function main() {
-  header("FLOW 2: Trading - Open / Close Long & Short");
+  header("FLOW 2: Trading - Open / Close Long & Short (real Pyth)");
 
-  const deployer    = getDeployer();
-  const keeperBot   = getWallet("keeperBot");
-  const bob         = getWallet("bob");
-  const tokenCfg    = TOKENS.AAPLx;
-  const spyCfg      = TOKENS.SPYx;
+  const deployer  = getDeployer();
+  const bob       = getWallet("bob");
+  const tokenCfg  = TOKENS.AAPLx;
+  const spyCfg    = TOKENS.SPYx;
 
-  const mockPyth = new ethers.Contract(CONTRACTS.mockPyth, MOCK_PYTH_ABI, deployer);
-  const usdc     = new ethers.Contract(CONTRACTS.usdc, ERC20_ABI, deployer);
-  const exchange = new ethers.Contract(CONTRACTS.exchange, EXCHANGE_ABI, deployer);
+  const pythAdapter = new ethers.Contract(CONTRACTS.pythAdapter, PYTH_ADAPTER_ABI, deployer);
+  const usdc        = new ethers.Contract(CONTRACTS.usdc, ERC20_ABI, deployer);
+  const exchange    = new ethers.Contract(CONTRACTS.exchange, EXCHANGE_ABI, deployer);
 
   // 1. Ensure pools have liquidity
   const aaplPool = await exchange.getPoolConfig(tokenCfg.px);
@@ -66,6 +66,7 @@ async function main() {
     "function closeMarket(address[],bytes[]) payable",
   ], deployer);
 
+  const keeperBot = getWallet("keeperBot");
   if (!(await keeperAdmin.getKeeperStatus(keeperBot.address))) {
     await (await keeperAdmin.addKeeper(keeperBot.address)).wait();
     log("KeeperBot added as keeper");
@@ -78,70 +79,51 @@ async function main() {
     log("Market already open");
   }
 
-  // 5. Bob opens 3x long xAAPL with $3000 collateral
+  // 5. Bob opens 3x long xAAPL with $3000 collateral (price fetched from Hermes)
   const bobExchange = new ethers.Contract(CONTRACTS.exchange, EXCHANGE_ABI, bob);
   const collateral  = parseUsdc("3000");
 
-  const aapl1 = await priceData(mockPyth, tokenCfg.feedId, tokenCfg.price);
-  log(`Bob opening 3x long xAAPL @ $${(tokenCfg.price / 100).toFixed(2)}...`);
-  const longTx = await bobExchange.openLong(tokenCfg.px, collateral, ethers.parseEther("3"), aapl1.updates, { value: aapl1.fee });
+  log("Fetching live xAAPL price from Hermes...");
+  const aapl1 = await hermesData(pythAdapter, tokenCfg.feedId);
+  log("Bob opening 3x long xAAPL...");
+  const longTx      = await bobExchange.openLong(tokenCfg.px, collateral, ethers.parseEther("3"), aapl1.updates, { value: aapl1.fee });
   const longReceipt = await longTx.wait();
   const longPositionId = extractPositionId(longReceipt);
   log(`Long position ID: ${longPositionId}`);
 
   // 6. Bob opens 2x short xSPY with $3000 collateral
-  const spy1 = await priceData(mockPyth, spyCfg.feedId, spyCfg.price);
-  log(`Bob opening 2x short xSPY @ $${(spyCfg.price / 100).toFixed(2)}...`);
-  const shortTx = await bobExchange.openShort(spyCfg.px, collateral, ethers.parseEther("2"), spy1.updates, { value: spy1.fee });
+  log("Fetching live xSPY price from Hermes...");
+  const spy1 = await hermesData(pythAdapter, spyCfg.feedId);
+  log("Bob opening 2x short xSPY...");
+  const shortTx      = await bobExchange.openShort(spyCfg.px, collateral, ethers.parseEther("2"), spy1.updates, { value: spy1.fee });
   const shortReceipt = await shortTx.wait();
   const shortPositionId = extractPositionId(shortReceipt);
   log(`Short position ID: ${shortPositionId}`);
 
   log(`Bob USDC after opens: ${fmtUsdc(await bobUsdc.balanceOf(bob.address))}`);
 
-  // 7. Prices move: AAPL $213.42 -> $220, SPY $587.50 -> $575
-  const newAaplPrice = 22000;
-  const newSpyPrice  = 57500;
-  log(`Prices move: xAAPL -> $${newAaplPrice / 100}, xSPY -> $${newSpyPrice / 100}`);
-  await pushPrice(mockPyth, deployer, tokenCfg.feedId, newAaplPrice);
-  await pushPrice(mockPyth, deployer, spyCfg.feedId, newSpyPrice);
-
-  // 8. Bob closes long
-  const aapl2 = await priceData(mockPyth, tokenCfg.feedId, newAaplPrice);
+  // 7. Close long (fresh Hermes fetch reflects current real price)
+  log("Fetching fresh xAAPL price for close...");
+  const aapl2 = await hermesData(pythAdapter, tokenCfg.feedId);
   log("Bob closing long...");
   await (await bobExchange.closeLong(longPositionId, aapl2.updates, { value: aapl2.fee })).wait();
   log(`Bob USDC after close long: ${fmtUsdc(await bobUsdc.balanceOf(bob.address))}`);
 
-  // 9. Bob closes short
-  const spy2 = await priceData(mockPyth, spyCfg.feedId, newSpyPrice);
+  // 8. Close short
+  log("Fetching fresh xSPY price for close...");
+  const spy2 = await hermesData(pythAdapter, spyCfg.feedId);
   log("Bob closing short...");
   await (await bobExchange.closeShort(shortPositionId, spy2.updates, { value: spy2.fee })).wait();
 
   const finalBal = await bobUsdc.balanceOf(bob.address);
-  const startBal = parseUsdc("20000");
   log(`Bob final USDC: ${fmtUsdc(finalBal)}`);
+  log("PASS: Long and short opened and closed with real Pyth prices [VERIFIED]");
 
-  const pnl = finalBal - startBal;
-  if (pnl >= 0n) {
-    log(`PASS: Bob net PnL +${fmtUsdc(pnl)} USDC [VERIFIED]`);
-  } else {
-    log(`INFO: Bob net PnL: -${fmtUsdc(-pnl)} USDC`);
-  }
-
-  // 10. Close market
+  // 9. Close market (no open positions -- empty updates are fine)
   await (await keeperAdmin.closeMarket([tokenCfg.px, spyCfg.px], [], { value: 0n })).wait();
   log("Market closed");
 
   header("Flow 2 Complete");
-}
-
-async function pushPrice(mockPyth, signer, feedId, price) {
-  const ts = Math.floor(Date.now() / 1000);
-  const data = await mockPyth.createPriceFeedUpdateData(
-    feedId, BigInt(price), 100n, -2, BigInt(price), 100n, BigInt(ts)
-  );
-  const fee = await mockPyth.getUpdateFee([data]);
-  await (await mockPyth.connect(signer).updatePriceFeeds([data], { value: fee })).wait();
 }
 
 main().catch(console.error);
