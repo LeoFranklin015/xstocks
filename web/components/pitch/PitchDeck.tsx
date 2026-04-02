@@ -12,21 +12,19 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  AlertTriangle,
   Check,
   X,
-  AlertTriangle,
 } from "lucide-react";
 import {
   AnimSplitTokens,
   AnimProblemBars,
   AnimArchitectureFlow,
-  AnimApyMeter,
-  AnimAccumulatorPulse,
-  AnimPhaseDots,
   AnimMoatGrid,
-  AnimMarketSize,
   AnimFlywheel,
   AnimSolutionSteps,
+  AnimPhaseDots,
+  AnimMarketSize,
 } from "./pitch-visuals";
 import { APP_NAME, APP_NAME_FULL } from "@/lib/constants";
 import { LogoWordmark } from "@/components/LogoWordmark";
@@ -38,30 +36,23 @@ type SlideDef = {
   visual?: ReactNode;
   body: ReactNode;
   centerTitle?: boolean;
-  /** When start, slide content aligns to the left (second slide, etc.) */
   contentAlign?: "center" | "start";
-  /** Text body left, visual right (lg grid); stacks body-first on small screens */
   splitBodyVisual?: boolean;
 };
 
 const slides: SlideDef[] = [
-  /* ── 1. Hook ── */
+  /* -- 1. Title -- */
   {
-    id: "hook",
-    section: APP_NAME,
-    title: "You can trade a stock on-chain. You can't trade its dividend.",
+    id: "title",
+    section: "xStream",
+    title: "Yield Stripping for Tokenized Equities",
     centerTitle: true,
     visual: <AnimSplitTokens />,
     body: (
       <>
         <p className="mt-6 max-w-xl text-center text-base text-muted-foreground">
-          Every xStock pays dividends -- quarterly, variable, regime-dependent.
-          But today there is no way to sell that yield, hedge it, lever it, or
-          price what next quarter's payout is worth. The yield is trapped inside
-          the token.
-        </p>
-        <p className="mt-4 max-w-lg text-center font-mono text-sm text-accent">
-          {APP_NAME_FULL} sets it free.
+          Splitting xStocks into income and price exposure -- two tokens, two
+          markets, one vault.
         </p>
         <motion.div
           className="mt-14 flex justify-center"
@@ -75,11 +66,11 @@ const slides: SlideDef[] = [
     ),
   },
 
-  /* ── 2. Problem ── */
+  /* -- 2. Problem -- */
   {
     id: "problem",
-    section: "01 -- The problem",
-    title: "Equity yield is the largest untouched primitive in DeFi",
+    section: "01 -- The Problem",
+    title: "Tokenized equities bundle two types of value into one token",
     contentAlign: "start",
     visual: <AnimProblemBars />,
     body: (
@@ -87,61 +78,71 @@ const slides: SlideDef[] = [
         <li className="flex gap-2">
           <span className="text-red-400/90">-</span>
           <span>
-            xStock dividends are <strong className="text-foreground">discrete</strong>{" "}
-            (quarterly), <strong className="text-foreground">variable</strong>{" "}
-            (board-set), and <strong className="text-foreground">regime-dependent</strong>{" "}
-            (cut in bears, raised in bulls).
+            A day trader holding xSPY for 6 hours is{" "}
+            <strong className="text-foreground">paying for a dividend</strong>{" "}
+            they will never collect.
           </span>
         </li>
         <li className="flex gap-2">
           <span className="text-red-400/90">-</span>
           <span>
-            A single token bundles price risk and dividend risk. Holders cannot
-            isolate one without selling the other entirely.
+            An income investor holding xSPY is absorbing{" "}
+            <strong className="text-foreground">price volatility</strong> they
+            do not want.
           </span>
         </li>
         <li className="flex gap-2">
           <span className="text-red-400/90">-</span>
           <span>
-            No on-chain yield curve for equity dividends. No fixed income. No
-            forward market. No way to express a view on payouts alone.
+            DeFi has{" "}
+            <strong className="text-foreground">no fixed-income primitive</strong>{" "}
+            for equity yield -- the largest yield market in the world ($3T+
+            securities lending, $500B+ dividend market) has no onchain
+            equivalent.
+          </span>
+        </li>
+        <li className="flex gap-2">
+          <span className="text-red-400/90">-</span>
+          <span>
+            Existing lending protocols ignore dividend mechanics entirely --
+            rebases during borrows are{" "}
+            <strong className="text-foreground">unhandled and exploitable</strong>.
           </span>
         </li>
         <li className="flex gap-2">
           <span className="text-accent">+</span>
           <span>
-            In TradFi, interest-rate derivatives exist precisely to separate yield
-            from principal. That market is $500T+ in notional. For tokenized
-            equities on-chain, it is zero.
+            xStocks are underleveraged as a DeFi primitive. Their two core value
+            components -- yield and price -- have never been separated.
           </span>
         </li>
       </ul>
     ),
   },
 
-  /* ── 3. Solution (one sentence) ── */
+  /* -- 3. Solution in One Sentence -- */
   {
     id: "solution",
-    section: "02 -- The solution",
-    title: "Deposit. Split. Trade.",
+    section: "02 -- The Solution",
+    title: "Split. Trade. Arbitrage.",
     centerTitle: true,
     visual: <AnimSolutionSteps />,
     body: (
       <>
         <p className="mt-8 max-w-2xl text-center text-base text-muted-foreground">
-          xStream splits any xStock into a{" "}
-          <span className="font-mono text-accent">dx</span> (dividend token --
-          receives 100% of yield, tradeable 24/7) and a{" "}
-          <span className="font-mono text-foreground">px</span> (price token --
-          pure price exposure, leveraged, session-gated) -- then lets you trade,
-          hedge, or recombine each leg independently.
+          xStream splits xStocks into a{" "}
+          <span className="font-mono text-accent">xdSPY</span> (dividend token)
+          and a <span className="font-mono text-foreground">xpSPY</span> (price
+          token), then builds a 24/7 income market and an intraday leveraged
+          trading market around each -- connected by an arbitrage mechanism that
+          keeps both tokens honestly priced.
         </p>
         <div className="mt-8 grid max-w-3xl grid-cols-2 gap-4 md:grid-cols-4">
           {[
-            { k: "xStock", sub: "Tokenized equity" },
-            { k: "dx", sub: "Dividend / yield leg" },
-            { k: "px", sub: "Price / principal leg" },
-            { k: "Recombine", sub: "Burn both, get xStock" },
+            { k: "xSPY", sub: "Tokenized equity" },
+            { k: "xdSPY", sub: "Dividend / income leg" },
+            { k: "xpSPY", sub: "Price / leverage leg" },
+            { k: "Recombine", sub: "Burn both, get xSPY" },
           ].map((c) => (
             <motion.div
               key={c.k}
@@ -159,82 +160,27 @@ const slides: SlideDef[] = [
     ),
   },
 
-  /* ── 4. xStocks depth (targets 30% Relevance score) ── */
-  {
-    id: "xstocks",
-    section: "03 -- Why xStocks are the foundation",
-    title: "Built on xStocks. Not bolted on.",
-    contentAlign: "start",
-    body: (
-      <div className="mt-6 w-full max-w-3xl">
-        <div className="grid gap-3 sm:grid-cols-2">
-          {[
-            {
-              tag: "Rebase detection",
-              detail:
-                "Vault reads xStock.multiplier() every sync to detect dividend events. The entire accumulator is driven by this xStock-native signal.",
-            },
-            {
-              tag: "6 live assets",
-              detail:
-                "AAPL, NVDA, TSLA, SPY, GOOGL, GLD -- each registered with real Pyth price feeds on Sepolia testnet today.",
-            },
-            {
-              tag: "Demand flywheel",
-              detail:
-                "Every vault deposit locks xStocks on-chain. Splitting creates NEW demand from users who would never hold a plain xStock.",
-            },
-            {
-              tag: "Recombination anchor",
-              detail:
-                "Burn dx + px = redeem xStock. This creates hard arbitrage bounds that keep the combined price pegged to the underlier -- no oracle needed.",
-            },
-          ].map((item, i) => (
-            <motion.div
-              key={item.tag}
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.06 * i }}
-              className="rounded-2xl border border-accent/20 bg-accent/[0.04] p-5"
-            >
-              <p className="font-mono text-xs text-accent">{item.tag}</p>
-              <p className="mt-2 text-sm text-muted-foreground">{item.detail}</p>
-            </motion.div>
-          ))}
-        </div>
-        <p className="mt-6 text-sm text-muted-foreground">
-          xStocks are not one of many supported assets -- they are{" "}
-          <strong className="text-foreground">the asset class the protocol exists to serve</strong>.
-          Every contract, every oracle call, every session gate is designed around
-          how tokenized equities and their dividends actually work.
-        </p>
-      </div>
-    ),
-  },
-
-  /* ── 5. What's unique ── */
+  /* -- 4. What's Unique -- */
   {
     id: "unique",
-    section: "04 -- What makes this different",
-    title: "Four things nobody else does",
+    section: "03 -- What Makes This Different",
+    title: "Three things that don't exist anywhere in DeFi today",
     contentAlign: "start",
     visual: <AnimMoatGrid />,
     body: (
       <p className="mt-6 max-w-2xl text-left text-sm text-muted-foreground">
-        Yield tokenization exists for LSTs and stablecoins, but nobody has
-        applied it to tokenized equities. xStream is purpose-built for the
-        mechanics of equity dividends: discrete rebases, session-gated trading,
-        and an auction layer for forward yield pricing.
+        In Pendle, only the yield token is exciting. In xStream, both tokens
+        serve massive existing markets -- income investors and leveraged day
+        traders.
       </p>
     ),
   },
 
-  /* ── 6. Architecture ── */
+  /* -- 5. Implementation / Approach -- */
   {
     id: "architecture",
-    section: "05 -- How it works",
-    title: "7 contracts. Real feeds. Live testnet.",
+    section: "04 -- How It Works",
+    title: "Three contracts, two markets, one arbitrage anchor",
     contentAlign: "start",
     splitBodyVisual: true,
     visual: (
@@ -243,11 +189,11 @@ const slides: SlideDef[] = [
         <div className="flex w-full flex-wrap justify-center gap-2 lg:max-w-md lg:justify-end">
           {[
             "XStreamVault",
-            "XStreamExchange",
-            "DxLeaseEscrow",
-            "PythAdapter",
-            "MarketKeeper",
-            "dx / px / LP tokens",
+            "xdSPY / xpSPY",
+            "Income AMM",
+            "Trading Engine",
+            "Keeper Bot",
+            "Chainlink Feeds",
           ].map((name) => (
             <span
               key={name}
@@ -262,274 +208,221 @@ const slides: SlideDef[] = [
     body: (
       <ul className="max-w-xl space-y-3 text-left text-sm text-muted-foreground">
         <li>
-          <strong className="text-foreground">Vault:</strong> Deposit xStock,
-          mint 1:1 dx + px. Masterchef accumulator (1e36 precision) routes 100%
-          of rebase yield to dx holders at O(1) gas.
+          <strong className="text-foreground">Vault:</strong> Deposit xSPY, mint
+          xdSPY + xpSPY at 1:1. When xSPY balance increases on dividend, 100%
+          is attributed to xdSPY holders atomically.
         </li>
         <li>
-          <strong className="text-foreground">Exchange:</strong> Leveraged
-          long/short on px with USDC collateral. Session-gated to NYSE hours.
-          Keeper force-settles all positions at close.
+          <strong className="text-foreground">Income Market (24/7):</strong>{" "}
+          AMM pool xdSPY/USDC. Price accrues toward dividend date, spikes at
+          rebase, resets. No oracle needed.
         </li>
         <li>
-          <strong className="text-foreground">Oracle:</strong> Pyth pull model,
-          prices normalized to 1e18, 60s staleness enforcement. Real feeds for
-          AAPL, NVDA, TSLA, SPY, GOOGL, GLD.
+          <strong className="text-foreground">Day Trading (Market Hours):</strong>{" "}
+          Session 9:30-4:00 EST. Post USDC collateral, 3-5x SPY leverage.
+          At 4PM: P&L settled, xpSPY returns, fees go to xdSPY holders.
         </li>
         <li>
-          <strong className="text-foreground">Auction:</strong> dx holders lease
-          dividend rights for 1-4 quarters via competitive bidding -- a forward
-          yield market.
+          <strong className="text-foreground">Arbitrage Anchor:</strong>{" "}
+          xdSPY + xpSPY always redeemable for xSPY. Hard price ceiling and
+          floor enforced by self-interest -- no oracle needed.
         </li>
       </ul>
     ),
   },
 
-  /* ── 7. Auction (bloated CTA) ── */
+  /* -- 6. Viability and Uptake -- */
   {
-    id: "auction",
-    section: "06 -- Forward yield market",
-    title: "Rent yield. Bid for income.",
-    contentAlign: "start",
-    splitBodyVisual: true,
-    visual: (
-      <div className="w-full max-w-md space-y-3">
+    id: "viability",
+    section: "05 -- Viability and Uptake",
+    title: "The demand already exists",
+    centerTitle: true,
+    visual: <AnimMarketSize />,
+    body: (
+      <div className="mt-6 w-full max-w-3xl">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="rounded-2xl border border-accent/20 bg-accent/[0.04] p-5"
+          >
+            <p className="font-mono text-xs text-accent">
+              For income investors
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              SPY base dividend: ~1.3% annually. xpSPY session fees at 30%
+              utilization: ~10-15% annually.
+            </p>
+            <p className="mt-2 font-mono text-2xl text-accent">12-16% APY</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Real yield backed by S&P 500 corporate earnings -- not token
+              emissions.
+            </p>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.06 }}
+            className="rounded-2xl border border-border bg-card p-5"
+          >
+            <p className="font-mono text-xs text-foreground">
+              For day traders
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              SPY options: $400B+ daily notional. E-mini futures: $200B+ daily.
+              These users already trade intraday SPY exposure.
+            </p>
+            <p className="mt-2 font-mono text-2xl text-foreground">$600B+</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              daily notional in existing SPY trading markets.
+            </p>
+          </motion.div>
+        </div>
         <motion.div
-          className="overflow-hidden rounded-2xl border border-border bg-card"
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4 }}
-        >
-          <div className="flex items-center justify-between border-b border-border/50 px-5 py-4">
-            <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-full bg-accent/15 font-mono text-xs font-bold text-accent">
-                xd
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-foreground">xdSPY</p>
-                <p className="text-[10px] text-muted-foreground">
-                  500 tokens / 2Q lease
-                </p>
-              </div>
-            </div>
-            <span className="rounded-full bg-foreground px-2.5 py-1 text-[10px] font-bold text-background">
-              14.2% APY
-            </span>
-          </div>
-          <div className="grid grid-cols-2 gap-3 px-5 py-4">
-            <div className="rounded-xl border border-border/40 bg-muted/30 p-3">
-              <p className="text-[9px] font-medium uppercase tracking-wider text-muted-foreground">
-                Highest Bid
-              </p>
-              <p className="mt-1 text-xl font-bold text-accent">$2,450</p>
-              <p className="text-[9px] text-muted-foreground">USDC</p>
-            </div>
-            <div className="rounded-xl border border-border/40 bg-muted/30 p-3">
-              <p className="text-[9px] font-medium uppercase tracking-wider text-muted-foreground">
-                Floor Price
-              </p>
-              <p className="mt-1 text-xl font-bold text-foreground">$1,800</p>
-              <p className="text-[9px] text-muted-foreground">USDC</p>
-            </div>
-          </div>
-          <div className="space-y-3 px-5 pb-5">
-            <div className="flex gap-2">
-              <div className="flex h-12 flex-1 items-center rounded-xl border border-border/50 bg-muted/30 px-4 font-mono text-lg text-muted-foreground/40">
-                2,500
-              </div>
-              <motion.button
-                className="flex h-12 items-center gap-2 rounded-xl bg-accent px-6 text-sm font-bold text-accent-foreground shadow-lg shadow-accent/20"
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.97 }}
-              >
-                Bid
-              </motion.button>
-            </div>
-            <motion.button
-              className="flex h-14 w-full items-center justify-center gap-2.5 rounded-2xl bg-foreground text-base font-bold text-background shadow-xl shadow-foreground/10"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.97 }}
-            >
-              List Your Tokens
-            </motion.button>
-          </div>
-        </motion.div>
-        <motion.div
-          className="flex flex-wrap gap-2"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.2 }}
+          className="mt-4 rounded-2xl border border-border bg-card p-4"
         >
-          {["6h 42m left", "12 bids", "+xPoints"].map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full border border-border bg-muted px-3 py-1 font-mono text-[10px] text-muted-foreground"
-            >
-              {tag}
-            </span>
-          ))}
+          <p className="font-mono text-xs text-muted-foreground">
+            Cold start solved
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Two-sided market with aligned incentives from day one. Recombination
+            arbitrage ensures price efficiency without seeded liquidity.
+          </p>
         </motion.div>
       </div>
     ),
-    body: (
-      <ul className="max-w-xl space-y-3 text-left text-sm text-muted-foreground">
-        <li>
-          dx holders <strong className="text-foreground">auction</strong> their
-          dividend stream for a fixed lease (1-4 quarters). Bidders compete in
-          USDC.
-        </li>
-        <li>
-          Highest bidder receives all dividends during the lease. After expiry,
-          dx returns to the seller automatically.
-        </li>
-        <li>
-          This is a{" "}
-          <strong className="text-foreground">forward yield market</strong> --
-          price discovery on what future dividends are worth, not just spot yield.
-        </li>
-        <li>
-          Nothing like this exists for tokenized equities today.
-        </li>
-      </ul>
-    ),
   },
 
-  /* ── 8. Viability + Impact ── */
+  /* -- 7. Impact for xStocks -- */
   {
-    id: "viability",
-    section: "07 -- Viability and impact",
-    title: "Who uses this, and why it matters for xStocks",
-    centerTitle: true,
+    id: "impact",
+    section: "06 -- Impact for xStocks",
+    title: "The most composable RWA primitive in DeFi",
+    contentAlign: "start",
     visual: <AnimFlywheel />,
     body: (
       <div className="mt-6 w-full max-w-3xl">
         <div className="grid gap-3 sm:grid-cols-2">
           {[
             {
-              n: "Income investors",
-              d: "Buy dx for yield without price volatility. Claim dividends. Reinvest.",
+              tag: "Rebase is load-bearing",
+              detail:
+                "Without onchain dividend rebasing, yield stripping cannot work. xStocks are the only asset that makes this possible.",
             },
             {
-              n: "Day traders",
-              d: "Leveraged price exposure via px. No dividend drag. USDC-settled. Session-gated.",
+              tag: "Market hours are load-bearing",
+              detail:
+                "Without price freeze at market close, forced intraday settlement is unfair and manipulatable.",
             },
             {
-              n: "Yield strippers",
-              d: "Split xStock, sell px for USDC, hold dx at below-face cost basis.",
+              tag: "First fixed-income primitive",
+              detail:
+                "Unlocks institutional and treasury demand that currently has nowhere to go in the xStocks ecosystem.",
             },
             {
-              n: "Arbitrageurs",
-              d: "Recombine when dx + px < xStock, split when >. Keep system price-efficient.",
+              tag: "Every xStock compatible",
+              detail:
+                "Any new xStock asset (xAAPL, xTSLA, xQQQ) is immediately compatible with the vault architecture.",
             },
-          ].map((p, i) => (
+          ].map((item, i) => (
             <motion.div
-              key={p.n}
-              initial={{ opacity: 0, y: 10 }}
+              key={item.tag}
+              initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.06 * i }}
-              className="rounded-2xl border border-border bg-card p-4"
+              className="rounded-2xl border border-accent/20 bg-accent/[0.04] p-5"
             >
-              <p className="font-mono text-xs text-accent">{p.n}</p>
-              <p className="mt-1.5 text-xs text-muted-foreground">{p.d}</p>
+              <p className="font-mono text-xs text-accent">{item.tag}</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {item.detail}
+              </p>
             </motion.div>
           ))}
         </div>
-        <div className="mt-6 rounded-2xl border border-accent/20 bg-accent/[0.04] p-5">
-          <p className="font-mono text-xs text-accent">Impact for xStocks</p>
-          <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            <li>
-              Every vault deposit <strong className="text-foreground">locks xStocks on-chain</strong>,
-              increasing demand beyond buy-and-hold.
-            </li>
-            <li>
-              dx and px are standard ERC-20s -- listable on any DEX, composable
-              with lending, yield aggregators, and other protocols.
-            </li>
-            <li>
-              Trading fees flow to LPs and dx holders, creating a self-reinforcing
-              flywheel of deposits, liquidity, and volume.
-            </li>
-          </ul>
-        </div>
+        <p className="mt-6 text-sm text-muted-foreground">
+          xStream proves that xStocks infrastructure unlocks{" "}
+          <strong className="text-foreground">
+            entirely new financial markets
+          </strong>
+          , not just a blockchain wrapper on existing ones.
+        </p>
       </div>
     ),
   },
 
-  /* ── 9. Trade-offs + Roadmap ── */
+  /* -- 8. Judging Criteria -- */
   {
-    id: "roadmap",
-    section: "08 -- Roadmap and trade-offs",
-    title: "What we built, what we know, what is next",
-    visual: <AnimPhaseDots active={4} />,
+    id: "criteria",
+    section: "07 -- Judging Criteria Alignment",
+    title: "How xStream maps to what matters",
+    visual: <AnimPhaseDots active={5} />,
     body: (
       <div className="mt-8 w-full max-w-3xl text-left">
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* Progress */}
-          <div>
-            <p className="mb-3 font-mono text-xs uppercase tracking-widest text-accent">
-              Progress
-            </p>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>
-                <span className="font-mono text-accent">Phase 0-3</span>{" "}
-                Vault + Exchange + 6 xStock assets
-                <span className="ml-2 rounded bg-accent/15 px-1.5 py-0.5 font-mono text-[10px] text-accent">
-                  done
-                </span>
-              </li>
-              <li>
-                <span className="font-mono text-accent">Phase 4</span>{" "}
-                Testnet on Sepolia. Keeper running. Frontend live.
-                <span className="ml-2 rounded bg-accent/15 px-1.5 py-0.5 font-mono text-[10px] text-accent">
-                  live
-                </span>
-              </li>
-              <li>
-                <span className="font-mono text-foreground">Phase 5</span>{" "}
-                Third-party audit
-              </li>
-              <li>
-                <span className="font-mono text-foreground">Phase 6</span>{" "}
-                Mainnet on Base. Seed liquidity.
-              </li>
-            </ul>
-          </div>
-
-          {/* Trade-offs */}
-          <div>
-            <p className="mb-3 font-mono text-xs uppercase tracking-widest text-muted-foreground">
-              Honest trade-offs
-            </p>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li className="flex gap-2">
-                <AlertTriangle className="mt-0.5 size-3.5 shrink-0 text-yellow-500/70" />
-                <span>
-                  Keeper is centralized in v1. Chainlink Automation planned for v1.2.
-                </span>
-              </li>
-              <li className="flex gap-2">
-                <AlertTriangle className="mt-0.5 size-3.5 shrink-0 text-yellow-500/70" />
-                <span>
-                  500-position cap per pool to bound settlement gas.
-                </span>
-              </li>
-              <li className="flex gap-2">
-                <AlertTriangle className="mt-0.5 size-3.5 shrink-0 text-yellow-500/70" />
-                <span>
-                  Oracle dependency: Pyth feed unavailability halts trading (emergency close exists).
-                </span>
-              </li>
-              <li className="flex gap-2">
-                <AlertTriangle className="mt-0.5 size-3.5 shrink-0 text-yellow-500/70" />
-                <span>
-                  LP pool insolvency risk if many traders profit simultaneously. Fee income builds reserves over time.
-                </span>
-              </li>
-            </ul>
-          </div>
+        <div className="space-y-2">
+          {[
+            {
+              criterion: "xStocks Relevance",
+              weight: "30%",
+              detail:
+                "Rebase + market hours are structurally required -- not bolt-on",
+            },
+            {
+              criterion: "Technical Execution",
+              weight: "30%",
+              detail:
+                "Vault, two AMMs, keeper, rebase interception, live demo",
+            },
+            {
+              criterion: "Innovation",
+              weight: "15%",
+              detail:
+                "First yield stripping on real equity dividends in DeFi",
+            },
+            {
+              criterion: "UX & Design",
+              weight: "10%",
+              detail:
+                "Two clean user journeys -- staker and trader, no overlap",
+            },
+            {
+              criterion: "Market Potential",
+              weight: "10%",
+              detail:
+                "Addresses $400B+ daily SPY trading + dividend income market",
+            },
+            {
+              criterion: "Presentation",
+              weight: "5%",
+              detail:
+                "Clear trade-offs: keeper centralization, thin dividend on growth stocks",
+            },
+          ].map((row, i) => (
+            <motion.div
+              key={row.criterion}
+              initial={{ opacity: 0, x: -10 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.06 * i }}
+              className="flex items-center gap-4 rounded-xl border border-border bg-card px-5 py-3"
+            >
+              <span className="w-16 shrink-0 font-mono text-sm font-bold text-accent">
+                {row.weight}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-foreground">
+                  {row.criterion}
+                </p>
+                <p className="text-xs text-muted-foreground">{row.detail}</p>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
     ),

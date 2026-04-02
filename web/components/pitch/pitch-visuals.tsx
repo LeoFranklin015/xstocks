@@ -3,9 +3,8 @@
 import { motion, useMotionValue, useSpring, useMotionValueEvent } from "framer-motion";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { APP_NAME } from "@/lib/constants";
 
-/** Title slide: SY splits into YT + PT (README dividend-tokenization) */
+/** Title slide: xSPY splits into xdSPY + xpSPY */
 export function AnimSplitTokens() {
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-10">
@@ -16,7 +15,7 @@ export function AnimSplitTokens() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.45, type: "spring", stiffness: 140, damping: 16 }}
         >
-          <span className="font-medium text-accent">YT</span>
+          <span className="font-medium text-accent">xdSPY</span>
         </motion.div>
 
         <div className="flex min-w-0 flex-1 items-center gap-1 sm:gap-2">
@@ -33,8 +32,8 @@ export function AnimSplitTokens() {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.55 }}
           >
-            <span>SY</span>
-            <span className="mt-0.5 text-[8px] opacity-70">wrapped</span>
+            <span>xSPY</span>
+            <span className="mt-0.5 text-[8px] opacity-70">vault</span>
           </motion.div>
           <motion.div
             className="h-0.5 flex-1 rounded-full bg-foreground/15"
@@ -51,7 +50,7 @@ export function AnimSplitTokens() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.55, type: "spring", stiffness: 140, damping: 16 }}
         >
-          PT
+          xpSPY
         </motion.div>
       </div>
 
@@ -61,13 +60,13 @@ export function AnimSplitTokens() {
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
       >
-        dividend-tokenization: yield vs principal
+        income token + price token = yield stripping
       </motion.p>
     </div>
   );
 }
 
-/** Problem: status quo vs protocol */
+/** Problem: bundled value bars */
 export function AnimProblemBars() {
   const bars = [
     { h: 72, key: "a" },
@@ -78,7 +77,7 @@ export function AnimProblemBars() {
     <div className="flex w-full max-w-md gap-6">
       <div className="flex flex-1 flex-col items-center gap-2">
         <span className="w-full text-left font-mono text-[10px] uppercase tracking-widest text-red-400/90">
-          today
+          bundled
         </span>
         <div className="flex h-40 w-full items-end justify-center gap-2 rounded-2xl border border-red-500/20 bg-red-500/[0.06] p-4">
           {bars.map((b, i) => (
@@ -95,7 +94,7 @@ export function AnimProblemBars() {
       </div>
       <div className="flex flex-1 flex-col items-center gap-2">
         <span className="w-full text-left font-mono text-[10px] uppercase tracking-widest text-accent">
-          {APP_NAME}
+          xStream
         </span>
         <div className="flex h-40 w-full items-center justify-center rounded-2xl border border-accent/25 bg-accent/[0.05] p-4">
           <motion.div
@@ -133,14 +132,14 @@ function ArchNode({
   );
 }
 
-/** Architecture: div lines + nodes (no SVG) */
+/** Architecture flow diagram */
 export function AnimArchitectureFlow() {
   return (
     <div className="mx-auto flex w-full max-w-md flex-col items-center gap-0">
-      <ArchNode label="Users" />
+      <ArchNode label="xSPY Deposit" accent />
 
       <motion.div
-        className="h-10 w-px bg-gradient-to-b from-foreground/20 to-accent/40"
+        className="h-10 w-px bg-gradient-to-b from-accent/40 to-foreground/20"
         initial={{ scaleY: 0, opacity: 0 }}
         whileInView={{ scaleY: 1, opacity: 1 }}
         viewport={{ once: true }}
@@ -148,9 +147,20 @@ export function AnimArchitectureFlow() {
         style={{ transformOrigin: "top center" }}
       />
 
+      <ArchNode label="Vault (mint 1:1)" accent />
+
+      <motion.div
+        className="h-8 w-px bg-foreground/20"
+        initial={{ scaleY: 0 }}
+        whileInView={{ scaleY: 1 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.1, duration: 0.3 }}
+        style={{ transformOrigin: "top center" }}
+      />
+
       <div className="flex w-full items-start justify-between gap-2 px-1 sm:gap-4">
         <div className="flex flex-1 flex-col items-center gap-2">
-          <ArchNode label="SY + split" accent />
+          <ArchNode label="xdSPY Market" accent />
           <motion.div
             className="h-8 w-px bg-accent/45"
             initial={{ scaleY: 0 }}
@@ -159,11 +169,11 @@ export function AnimArchitectureFlow() {
             transition={{ delay: 0.15, duration: 0.3 }}
             style={{ transformOrigin: "top center" }}
           />
-          <ArchNode label="Pyth" accent />
+          <ArchNode label="24/7 AMM" />
         </div>
 
-        <div className="flex flex-1 flex-col items-center gap-2 pt-10 sm:pt-12">
-          <ArchNode label="Exchange" />
+        <div className="flex flex-1 flex-col items-center gap-2">
+          <ArchNode label="xpSPY Market" />
           <motion.div
             className="h-8 w-px bg-foreground/15"
             initial={{ scaleY: 0 }}
@@ -172,7 +182,7 @@ export function AnimArchitectureFlow() {
             transition={{ delay: 0.2, duration: 0.3 }}
             style={{ transformOrigin: "top center" }}
           />
-          <ArchNode label="Keeper" />
+          <ArchNode label="Session Keeper" />
         </div>
       </div>
 
@@ -183,22 +193,18 @@ export function AnimArchitectureFlow() {
         viewport={{ once: true }}
       >
         <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-        <span className="font-mono text-[10px] text-muted-foreground">Base + Pyth pull</span>
+        <span className="font-mono text-[10px] text-muted-foreground">
+          recombine: xdSPY + xpSPY = xSPY
+        </span>
       </motion.div>
     </div>
   );
 }
 
-/** APY number spring */
-export function AnimApyMeter({
-  target = 14,
-  className,
-}: {
-  target?: number;
-  className?: string;
-}) {
+/** Viability: market size counter */
+export function AnimMarketSize() {
   const raw = useMotionValue(0);
-  const spring = useSpring(raw, { stiffness: 90, damping: 22 });
+  const spring = useSpring(raw, { stiffness: 60, damping: 20 });
   const [display, setDisplay] = useState(0);
 
   useMotionValueEvent(spring, "change", (v) => {
@@ -207,53 +213,27 @@ export function AnimApyMeter({
 
   useEffect(() => {
     raw.set(0);
-    const id = requestAnimationFrame(() => raw.set(target));
+    const id = requestAnimationFrame(() => raw.set(600));
     return () => cancelAnimationFrame(id);
-  }, [raw, target]);
+  }, [raw]);
 
   return (
-    <div className={cn("flex flex-col items-center gap-2", className)}>
-      <span className="font-[family-name:var(--font-safira)] text-6xl tabular-nums text-accent md:text-7xl">
-        {display}
-      </span>
-        <span className="font-mono text-xs text-muted-foreground">illustrative YT yield (%)</span>
+    <div className="flex flex-col items-center gap-6">
+      <div className="text-center">
+        <span className="font-[family-name:var(--font-safira)] text-6xl tabular-nums text-accent md:text-8xl">
+          ${display}B+
+        </span>
+        <p className="mt-2 font-mono text-xs text-muted-foreground">
+          daily notional in SPY options + E-mini futures
+        </p>
+      </div>
     </div>
   );
 }
 
-/** Vault: accumulator pulse */
-export function AnimAccumulatorPulse({ className }: { className?: string }) {
-  return (
-    <div
-      className={cn(
-        "relative flex h-36 w-full max-w-md items-center justify-center",
-        className
-      )}
-    >
-      {[0, 1, 2].map((i) => (
-        <motion.div
-          key={i}
-          className="absolute rounded-full border border-accent/30"
-          style={{ width: 60 + i * 48, height: 60 + i * 48 }}
-          animate={{ scale: [1, 1.08, 1], opacity: [0.15, 0.45, 0.15] }}
-          transition={{
-            duration: 2.4,
-            repeat: Infinity,
-            delay: i * 0.35,
-            ease: "easeInOut",
-          }}
-        />
-      ))}
-      <span className="relative z-10 font-mono text-xs text-muted-foreground">
-        dividends accrue to YT
-      </span>
-    </div>
-  );
-}
-
-/** Roadmap phases */
+/** Roadmap / criteria phases */
 export function AnimPhaseDots({ active = 3 }: { active?: number }) {
-  const phases = ["0", "1", "2", "3", "4", "5", "6"];
+  const phases = ["1", "2", "3", "4", "5", "6"];
   return (
     <div className="flex items-center justify-center gap-1.5 sm:gap-2">
       {phases.map((p, i) => (
@@ -272,38 +252,32 @@ export function AnimPhaseDots({ active = 3 }: { active?: number }) {
   );
 }
 
-/** What's Unique: moat grid */
+/** What's Unique: 3 moat cards */
 export function AnimMoatGrid() {
   const items = [
     {
       tag: "01",
-      label: "Yield tokenization for equities",
+      label: "Yield stripping on real equity dividends",
       detail:
-        "First protocol to split tokenized stocks into yield and price legs on-chain.",
+        "Pendle does DeFi protocol yield -- variable, opaque, crypto-correlated. xStream does corporate dividends -- predictable, quarterly, backed by real earnings.",
     },
     {
       tag: "02",
-      label: "O(1) gas-efficient claims",
+      label: "xpSPY as an active trading instrument",
       detail:
-        "Masterchef-style accumulator at 1e36 precision. No iteration over holders.",
+        "In Pendle, the principal token is a boring zero-coupon bond. xpSPY is pure equity price exposure designed for leveraged intraday trading.",
     },
     {
       tag: "03",
-      label: "Session-gated exchange",
+      label: "Market-hours forced settlement",
       detail:
-        "px trading opens and closes with NYSE. Forced daily settlement -- no overnight risk.",
-    },
-    {
-      tag: "04",
-      label: "Forward yield auction",
-      detail:
-        "dx lease escrow lets holders auction future dividend streams. Price discovery on yield.",
+        "xStocks prices freeze at market close. This makes xpSPY settlement provably fair -- no after-hours manipulation, no overnight liquidation risk.",
     },
   ];
 
   return (
     <motion.div
-      className="grid w-full max-w-3xl grid-cols-1 gap-3 sm:grid-cols-2"
+      className="grid w-full max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3"
       initial="hidden"
       whileInView="show"
       viewport={{ once: true, margin: "-15%" }}
@@ -329,44 +303,14 @@ export function AnimMoatGrid() {
   );
 }
 
-/** Viability: market size counter */
-export function AnimMarketSize() {
-  const raw = useMotionValue(0);
-  const spring = useSpring(raw, { stiffness: 60, damping: 20 });
-  const [display, setDisplay] = useState(0);
-
-  useMotionValueEvent(spring, "change", (v) => {
-    setDisplay(Math.round(v));
-  });
-
-  useEffect(() => {
-    raw.set(0);
-    const id = requestAnimationFrame(() => raw.set(500));
-    return () => cancelAnimationFrame(id);
-  }, [raw]);
-
-  return (
-    <div className="flex flex-col items-center gap-6">
-      <div className="text-center">
-        <span className="font-[family-name:var(--font-safira)] text-6xl tabular-nums text-accent md:text-8xl">
-          ${display}T+
-        </span>
-        <p className="mt-2 font-mono text-xs text-muted-foreground">
-          TradFi interest-rate derivatives (notional)
-        </p>
-      </div>
-    </div>
-  );
-}
-
 /** Impact: ecosystem flywheel */
 export function AnimFlywheel() {
   const steps = [
     "xStock deposits",
-    "dx + px minted",
+    "xdSPY + xpSPY minted",
     "Trading volume",
     "Fee revenue",
-    "Higher dx yield",
+    "Higher xdSPY yield",
   ];
 
   return (
@@ -408,8 +352,8 @@ export function AnimFlywheel() {
 /** Solution: 3-step flow */
 export function AnimSolutionSteps() {
   const steps = [
-    { n: "1", label: "Deposit xStock", sub: "into the vault" },
-    { n: "2", label: "Mint dx + px", sub: "yield + price tokens" },
+    { n: "1", label: "Deposit xSPY", sub: "into the vault" },
+    { n: "2", label: "Mint xdSPY + xpSPY", sub: "income + price tokens" },
     { n: "3", label: "Trade each leg", sub: "on dedicated markets" },
   ];
 
