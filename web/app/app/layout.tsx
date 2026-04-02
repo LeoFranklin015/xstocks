@@ -18,6 +18,8 @@ import {
   Wallet,
   ChevronDown,
   Droplets,
+  Copy,
+  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,6 +44,10 @@ import { MarketTickerMarquee } from "@/components/MarketTickerMarquee";
 import TermsGate from "@/components/TermsGate";
 import { type Network } from "@/components/NetworkSelector";
 import { ModeProvider, useAppMode } from "@/lib/mode-context";
+import {
+  ContractModeProvider,
+  useContractMode,
+} from "@/lib/contract-mode-context";
 
 // ---- Network config (mirrors NetworkSelector but owned here for chain switching) ----
 
@@ -147,6 +153,39 @@ function ModeToggle() {
   );
 }
 
+// ---- Contract mode toggle (Prod / Mock) ----
+
+function ContractModeToggle() {
+  const { contractMode, toggleContractMode, isMock } = useContractMode();
+
+  return (
+    <div
+      onClick={toggleContractMode}
+      className="relative flex items-center h-8 rounded-full bg-[#eee] border border-black/[0.07] cursor-pointer select-none overflow-hidden"
+    >
+      <motion.div
+        className="absolute top-[2px] bottom-[2px] w-[calc(50%-4px)] rounded-full bg-white border border-black/[0.10] shadow-sm"
+        animate={{ left: isMock ? "calc(50% + 2px)" : "2px" }}
+        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+      />
+      <span
+        className={`relative z-10 flex-1 text-center text-[10px] font-medium transition-colors duration-200 ${
+          !isMock ? "text-green-600" : "text-black/30"
+        }`}
+      >
+        Prod
+      </span>
+      <span
+        className={`relative z-10 flex-1 text-center text-[10px] font-medium transition-colors duration-200 ${
+          isMock ? "text-orange-600" : "text-black/30"
+        }`}
+      >
+        Mock
+      </span>
+    </div>
+  );
+}
+
 // ---- Wallet panel ----
 
 function WalletPanel({
@@ -164,11 +203,23 @@ function WalletPanel({
   selectedNetwork: Network;
   onNetworkChange: (n: Network) => void;
 }) {
+  const [copied, setCopied] = useState(false);
   const faucetUrls: Record<string, string> = {
     "ink-sepolia": "https://inkonchain.com/en/faucet",
     "sepolia": "https://www.alchemy.com/faucets/ethereum-sepolia",
   };
   const faucetUrl = faucetUrls[selectedNetwork.id];
+
+  async function copyWalletAddress() {
+    if (!walletAddress) return;
+    try {
+      await navigator.clipboard.writeText(walletAddress);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard may be unavailable (e.g. permission denied)
+    }
+  }
 
   return (
     <div className="mx-3 rounded-xl bg-white border border-black/[0.05] overflow-hidden">
@@ -214,16 +265,28 @@ function WalletPanel({
       <div className="px-3 py-2.5 space-y-2">
         {authenticated && walletAddress ? (
           <>
-            <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={copyWalletAddress}
+              title="Copy address"
+              aria-label="Copy wallet address"
+              className="flex items-center gap-2 w-full min-w-0 rounded-lg px-1 -mx-1 py-1 text-left hover:bg-black/[0.04] transition-colors group"
+            >
               <div className="size-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                 <Wallet className="size-3 text-primary" />
-
               </div>
-              <span className="font-mono text-xs text-foreground">
-                {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+              <span className="flex-1 min-w-0 font-mono text-xs text-foreground truncate">
+                {copied
+                  ? "Copied"
+                  : `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`}
               </span>
-              <span className="ml-auto flex size-1.5 rounded-full bg-green-500" />
-            </div>
+              {copied ? (
+                <Check className="size-3.5 shrink-0 text-green-600" aria-hidden />
+              ) : (
+                <Copy className="size-3.5 shrink-0 text-muted-foreground opacity-70 group-hover:opacity-100" aria-hidden />
+              )}
+              <span className="flex size-1.5 shrink-0 rounded-full bg-green-500" title="Connected" />
+            </button>
             <button
               onClick={logout}
               className="w-full text-center text-[11px] text-muted-foreground hover:text-foreground transition-colors py-0.5"
@@ -287,6 +350,13 @@ function SidebarContent({
       {/* Mode toggle */}
       <div className="px-3 pt-3 pb-1">
         <ModeToggle />
+      </div>
+      <Separator className="mx-4 w-auto opacity-40 mt-2" />
+
+      {/* Contract mode toggle */}
+      <div className="px-3 pt-2 pb-1">
+        <p className="text-[10px] text-muted-foreground mb-1 px-1">Contracts</p>
+        <ContractModeToggle />
       </div>
       <Separator className="mx-4 w-auto opacity-40 mt-2" />
 
@@ -439,7 +509,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <TermsGate>
       <ModeProvider>
-        <AppLayoutInner>{children}</AppLayoutInner>
+        <ContractModeProvider>
+          <AppLayoutInner>{children}</AppLayoutInner>
+        </ContractModeProvider>
       </ModeProvider>
     </TermsGate>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Card,
@@ -21,15 +21,14 @@ import {
   Percent,
   Coins,
   ArrowDown,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppMode } from "@/lib/mode-context";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { xStockAssets, type Asset } from "@/lib/market-data";
-import {
-  LiveVaultBalance,
-  DEMO_VAULT_PRINCIPAL,
-  DEMO_VAULT_APY_ANNUAL,
-} from "@/components/LiveVaultBalance";
+import { useVault } from "@/lib/contracts/useVault";
+import { usePythPrices } from "@/lib/use-pyth-prices";
 
 const fadeUp = {
   initial: { opacity: 0, y: 12 },
@@ -38,64 +37,65 @@ const fadeUp = {
 
 type VaultMode = "deposit" | "withdraw";
 
-type VaultStat =
-  | {
-    kind: "live";
-    label: string;
-    principal: number;
-    apyAnnual: number;
-    icon: typeof Lock;
-    change: string;
-    positive: boolean;
-  }
-  | {
-    kind: "static";
-    label: string;
-    value: string;
-    icon: typeof Gift | typeof Percent | typeof DollarSign;
-    change: string;
-    positive: boolean;
-    isBadge?: boolean;
-  };
+type VaultStat = {
+  label: string;
+  value: string;
+  icon: typeof Lock | typeof Gift | typeof Percent | typeof DollarSign;
+  change: string;
+  positive: boolean;
+  isBadge?: boolean;
+};
 
-// Stats matching dashboard card pattern
-const vaultStats: VaultStat[] = [
-  {
-    kind: "live",
-    label: "Vault Balance",
-    principal: DEMO_VAULT_PRINCIPAL,
-    apyAnnual: DEMO_VAULT_APY_ANNUAL,
-    icon: Lock,
-    change: "+5.2%",
-    positive: true,
-  },
-  {
-    kind: "static",
-    label: "Claimable Rewards",
-    value: "$8.22",
-    icon: Gift,
-    change: "Claim",
-    positive: true,
-    isBadge: true,
-  },
-  {
-    kind: "static",
-    label: "Vault APY",
-    value: "4.82%",
-    icon: Percent,
-    change: "+0.32%",
-    positive: true,
-  },
-  {
-    kind: "static",
-    label: "Reward / Share",
-    value: "0.0234",
-    icon: DollarSign,
-    change: "USDC",
-    positive: true,
-    isBadge: true,
-  },
-];
+function formatUsd(n: number): string {
+  return "$" + n.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+function buildVaultStats(
+  vaultBalanceUsd: number,
+  pendingDiv: string,
+  dxBalance: string,
+): VaultStat[] {
+  const divNum = parseFloat(pendingDiv);
+  const divDisplay = divNum > 0 ? divNum.toFixed(4) : "0.00";
+  const dxNum = parseFloat(dxBalance);
+  const rewardPerShare = dxNum > 0 ? (divNum / dxNum) : 0;
+  return [
+    {
+      label: "Vault Balance",
+      value: formatUsd(vaultBalanceUsd),
+      icon: Lock,
+      change: dxNum > 0 ? `${parseFloat(dxBalance).toFixed(2)} tokens` : "--",
+      positive: true,
+      isBadge: true,
+    },
+    {
+      label: "Claimable Rewards",
+      value: divDisplay,
+      icon: Gift,
+      change: "Claim",
+      positive: true,
+      isBadge: true,
+    },
+    {
+      label: "Vault APY",
+      value: "4.82%",
+      icon: Percent,
+      change: "+0.32%",
+      positive: true,
+    },
+    {
+      label: "Reward / Share",
+      value: rewardPerShare > 0 ? rewardPerShare.toFixed(6) : "0.0000",
+      icon: DollarSign,
+      change: "xStock",
+      positive: true,
+      isBadge: true,
+    },
+  ];
+}
 
 // ---- Token Pill (Uniswap-style) ----
 function TokenPill({
@@ -259,15 +259,78 @@ function VaultModeTabs({
   );
 }
 
+// ---- Balances hook ----
+function useVaultBalances(asset: Asset) {
+  const { getBalances, getPendingDividend } = useVault();
+  const { authenticated } = usePrivy();
+  const { wallets } = useWallets();
+  const [balances, setBalances] = useState({ xStock: "0", px: "0", dx: "0" });
+  const [pendingDiv, setPendingDiv] = useState("0");
+  const [loading, setLoading] = useState(false);
+
+  const hasWallet = authenticated && wallets.length > 0;
+
+  const refresh = useCallback(async () => {
+    if (!hasWallet) return;
+    setLoading(true);
+    try {
+      const bals = await getBalances(asset.symbol);
+      setBalances(bals);
+    } catch (err) {
+      console.error("[useVaultBalances] balances fetch failed:", err);
+    }
+    try {
+      const div = await getPendingDividend(asset.symbol);
+      setPendingDiv(div);
+    } catch {
+      // pendingDividend reverts if user has no vault position -- expected
+      setPendingDiv("0");
+    }
+    setLoading(false);
+  }, [hasWallet, asset.symbol, getBalances, getPendingDividend]);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  return { balances, pendingDiv, loading, refresh };
+}
+
 // ---- Deposit Tab ----
-function DepositTab({ asset }: { asset: Asset }) {
+function DepositTab({
+  asset,
+  xStockBalance,
+  onSuccess,
+}: {
+  asset: Asset;
+  xStockBalance: string;
+  onSuccess: () => void;
+}) {
   const [amount, setAmount] = useState("");
   const numAmount = parseFloat(amount) || 0;
   const clean = (v: string) => v.replace(/[^0-9.]/g, "");
+  const { deposit, isLoading, error } = useVault();
+  const { authenticated } = usePrivy();
 
   const xSymbol = `x${asset.symbol}`;
   const xdSymbol = `xd${asset.symbol}`;
   const xpSymbol = `xp${asset.symbol}`;
+
+  const handleDeposit = async () => {
+    if (numAmount <= 0) return;
+    try {
+      await deposit(asset.symbol, amount);
+      setAmount("");
+      onSuccess();
+    } catch {
+      // error is set in hook
+    }
+  };
+
+  const displayBalance = parseFloat(xStockBalance).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 4,
+  });
 
   return (
     <div className="space-y-1">
@@ -288,7 +351,7 @@ function DepositTab({ asset }: { asset: Asset }) {
           <AssetSelector selected={asset} onSelect={() => { }} />
         </div>
         <p className="text-sm text-muted-foreground mt-3">
-          Balance: 1,250.00 {xSymbol}
+          Balance: {displayBalance} {xSymbol}
         </p>
       </div>
 
@@ -344,28 +407,66 @@ function DepositTab({ asset }: { asset: Asset }) {
         </span>
       </div>
 
+      {error && (
+        <p className="text-xs text-red-500 text-center px-2">{error}</p>
+      )}
+
       {/* CTA */}
       <Button
         type="button"
-        disabled={numAmount <= 0}
+        disabled={numAmount <= 0 || isLoading || !authenticated}
+        onClick={handleDeposit}
         className="w-full h-14 rounded-2xl bg-primary text-lg font-semibold text-primary-foreground hover:bg-primary/80 disabled:opacity-30 shadow-lg shadow-primary/10"
       >
-        <ArrowDownToLine className="size-5 mr-2.5" />
-        Deposit {xSymbol}
+        {isLoading ? (
+          <Loader2 className="size-5 mr-2.5 animate-spin" />
+        ) : (
+          <ArrowDownToLine className="size-5 mr-2.5" />
+        )}
+        {isLoading ? "Depositing..." : `Deposit ${xSymbol}`}
       </Button>
     </div>
   );
 }
 
 // ---- Withdraw Tab ----
-function WithdrawTab({ asset }: { asset: Asset }) {
+function WithdrawTab({
+  asset,
+  dxBalance,
+  pxBalance,
+  onSuccess,
+}: {
+  asset: Asset;
+  dxBalance: string;
+  pxBalance: string;
+  onSuccess: () => void;
+}) {
   const [returnAmount, setReturnAmount] = useState("");
   const clean = (v: string) => v.replace(/[^0-9.]/g, "");
   const numReturn = parseFloat(returnAmount) || 0;
+  const { withdraw, isLoading, error } = useVault();
+  const { authenticated } = usePrivy();
 
   const xSymbol = `x${asset.symbol}`;
   const xdSymbol = `xd${asset.symbol}`;
   const xpSymbol = `xp${asset.symbol}`;
+
+  const handleWithdraw = async () => {
+    if (numReturn <= 0) return;
+    try {
+      await withdraw(asset.symbol, returnAmount);
+      setReturnAmount("");
+      onSuccess();
+    } catch {
+      // error is set in hook
+    }
+  };
+
+  const fmtBal = (v: string) =>
+    parseFloat(v).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 4,
+    });
 
   return (
     <div className="space-y-1">
@@ -388,7 +489,7 @@ function WithdrawTab({ asset }: { asset: Asset }) {
           <TokenPill label={xdSymbol} color="#3b82f6" />
         </div>
         <p className="text-sm text-muted-foreground mb-4">
-          Balance: 625.00 {xdSymbol}
+          Balance: {fmtBal(dxBalance)} {xdSymbol}
         </p>
 
         <Separator className="opacity-30 my-4" />
@@ -401,7 +502,7 @@ function WithdrawTab({ asset }: { asset: Asset }) {
           <TokenPill label={xpSymbol} color="#8b5cf6" />
         </div>
         <p className="text-sm text-muted-foreground">
-          Balance: 625.00 {xpSymbol}
+          Balance: {fmtBal(pxBalance)} {xpSymbol}
         </p>
       </div>
 
@@ -425,16 +526,25 @@ function WithdrawTab({ asset }: { asset: Asset }) {
         </div>
       </div>
 
+      {error && (
+        <p className="text-xs text-red-500 text-center px-2">{error}</p>
+      )}
+
       {/* CTA */}
       <div className="pt-2">
         <Button
           type="button"
-          disabled={numReturn <= 0}
+          disabled={numReturn <= 0 || isLoading || !authenticated}
+          onClick={handleWithdraw}
           variant="outline"
           className="w-full h-14 rounded-2xl text-lg font-semibold disabled:opacity-30"
         >
-          <ArrowUpFromLine className="size-5 mr-2.5" />
-          Withdraw {xSymbol}
+          {isLoading ? (
+            <Loader2 className="size-5 mr-2.5 animate-spin" />
+          ) : (
+            <ArrowUpFromLine className="size-5 mr-2.5" />
+          )}
+          {isLoading ? "Withdrawing..." : `Withdraw ${xSymbol}`}
         </Button>
       </div>
     </div>
@@ -469,6 +579,13 @@ const steps = [
 function ExpertVault() {
   const [vaultMode, setVaultMode] = useState<VaultMode>("deposit");
   const [selectedAsset, setSelectedAsset] = useState<Asset>(xStockAssets[3]);
+  const { balances, pendingDiv, refresh } = useVaultBalances(selectedAsset);
+  const liveAssets = usePythPrices();
+  const liveAsset = liveAssets.find((a) => a.symbol === selectedAsset.symbol);
+  const assetPrice = liveAsset?.price ?? 0;
+  // dx balance = deposited tokens (1:1 with deposit)
+  const dxNum = parseFloat(balances.dx) || 0;
+  const vaultBalanceUsd = dxNum * assetPrice;
 
   return (
     <div className="p-4 md:p-6 space-y-4 max-w-7xl mx-auto">
@@ -484,7 +601,7 @@ function ExpertVault() {
 
       {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
-        {vaultStats.map((stat, i) => (
+        {buildVaultStats(vaultBalanceUsd, pendingDiv, balances.dx).map((stat, i) => (
           <motion.div
             key={stat.label}
             className="h-full"
@@ -500,20 +617,12 @@ function ExpertVault() {
               </CardHeader>
               <CardContent className="px-4 pb-4 pt-0">
                 <div className="min-h-9">
-                  {stat.kind === "live" ? (
-                    <LiveVaultBalance
-                      principal={stat.principal}
-                      apyAnnual={stat.apyAnnual}
-                      size="md"
-                    />
-                  ) : (
-                    <div className="text-3xl font-bold tracking-tight">
-                      {stat.value}
-                    </div>
-                  )}
+                  <div className="text-3xl font-bold tracking-tight">
+                    {stat.value}
+                  </div>
                 </div>
                 <div className="flex items-center gap-1 mt-1">
-                  {stat.kind === "static" && stat.isBadge ? (
+                  {stat.isBadge ? (
                     <Badge className="bg-primary/10 text-primary border-0 text-[10px]">
                       {stat.change}
                     </Badge>
@@ -554,9 +663,18 @@ function ExpertVault() {
                     transition={{ duration: 0.18 }}
                   >
                     {vaultMode === "deposit" ? (
-                      <DepositTab asset={selectedAsset} />
+                      <DepositTab
+                        asset={selectedAsset}
+                        xStockBalance={balances.xStock}
+                        onSuccess={refresh}
+                      />
                     ) : (
-                      <WithdrawTab asset={selectedAsset} />
+                      <WithdrawTab
+                        asset={selectedAsset}
+                        dxBalance={balances.dx}
+                        pxBalance={balances.px}
+                        onSuccess={refresh}
+                      />
                     )}
                   </motion.div>
                 </AnimatePresence>
@@ -605,10 +723,49 @@ function GrandmaVault() {
   const [depositAmount, setDepositAmount] = useState("");
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [selectedAsset, setSelectedAsset] = useState<Asset>(xStockAssets[3]);
+  const { balances, pendingDiv, refresh } = useVaultBalances(selectedAsset);
+  const { deposit, withdraw, claimDividend, isLoading, error } = useVault();
+  const { authenticated } = usePrivy();
+  const liveAssets = usePythPrices();
+  const liveAsset = liveAssets.find((a) => a.symbol === selectedAsset.symbol);
+  const assetPrice = liveAsset?.price ?? 0;
+  const dxNum = parseFloat(balances.dx) || 0;
+  const vaultBalanceUsd = dxNum * assetPrice;
 
   const depositNum = parseFloat(depositAmount) || 0;
   const withdrawNum = parseFloat(withdrawAmount) || 0;
   const xSymbol = `x${selectedAsset.symbol}`;
+
+  const fmtBal = (v: string) =>
+    parseFloat(v).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 4,
+    });
+
+  const handleDeposit = async () => {
+    if (depositNum <= 0) return;
+    try {
+      await deposit(selectedAsset.symbol, depositAmount);
+      setDepositAmount("");
+      refresh();
+    } catch { /* error in hook */ }
+  };
+
+  const handleWithdraw = async () => {
+    if (withdrawNum <= 0) return;
+    try {
+      await withdraw(selectedAsset.symbol, withdrawAmount);
+      setWithdrawAmount("");
+      refresh();
+    } catch { /* error in hook */ }
+  };
+
+  const handleClaim = async () => {
+    try {
+      await claimDividend(selectedAsset.symbol);
+      refresh();
+    } catch { /* error in hook */ }
+  };
 
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-6xl mx-auto">
@@ -627,14 +784,14 @@ function GrandmaVault() {
         <Card className="border-primary/20">
           <CardContent className="p-6 text-center">
             <p className="text-sm text-muted-foreground mb-2">Vault Balance</p>
-            <div className="flex justify-center">
-              <LiveVaultBalance
-                principal={DEMO_VAULT_PRINCIPAL}
-                apyAnnual={DEMO_VAULT_APY_ANNUAL}
-                size="lg"
-                className="justify-center"
-              />
-            </div>
+            <p className="text-4xl font-semibold text-foreground tracking-tight">
+              {formatUsd(vaultBalanceUsd)}
+            </p>
+            {dxNum > 0 && (
+              <p className="text-sm text-muted-foreground mt-1">
+                {dxNum.toFixed(2)} xd{selectedAsset.symbol} @ {formatUsd(assetPrice)}
+              </p>
+            )}
           </CardContent>
         </Card>
       </motion.div>
@@ -702,14 +859,21 @@ function GrandmaVault() {
                     </span>
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">
-                    Available: 1,250.00 {xSymbol}
+                    Available: {fmtBal(balances.xStock)} {xSymbol}
                   </p>
                 </div>
+                {error && (
+                  <p className="text-xs text-red-500 text-center">{error}</p>
+                )}
                 <Button
                   className="w-full h-14 rounded-xl bg-primary text-lg font-semibold text-primary-foreground hover:bg-primary/80"
-                  disabled={depositNum <= 0}
+                  disabled={depositNum <= 0 || isLoading || !authenticated}
+                  onClick={handleDeposit}
                 >
-                  Deposit
+                  {isLoading ? (
+                    <Loader2 className="size-5 mr-2 animate-spin" />
+                  ) : null}
+                  {isLoading ? "Depositing..." : "Deposit"}
                 </Button>
               </CardContent>
             </Card>
@@ -747,15 +911,19 @@ function GrandmaVault() {
                     </span>
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">
-                    In vault: 625.00 {xSymbol}
+                    In vault: {fmtBal(balances.dx)} xd{selectedAsset.symbol} / {fmtBal(balances.px)} xp{selectedAsset.symbol}
                   </p>
                 </div>
                 <Button
                   variant="outline"
                   className="w-full h-14 rounded-xl text-lg font-semibold"
-                  disabled={withdrawNum <= 0}
+                  disabled={withdrawNum <= 0 || isLoading || !authenticated}
+                  onClick={handleWithdraw}
                 >
-                  Withdraw
+                  {isLoading ? (
+                    <Loader2 className="size-5 mr-2 animate-spin" />
+                  ) : null}
+                  {isLoading ? "Withdrawing..." : "Withdraw"}
                 </Button>
               </CardContent>
             </Card>
@@ -771,12 +939,20 @@ function GrandmaVault() {
                     Earnings Ready to Collect
                   </p>
                   <p className="text-4xl font-semibold text-primary font-mono tracking-tight mt-1">
-                    $8.22
+                    {parseFloat(pendingDiv) > 0 ? parseFloat(pendingDiv).toFixed(4) : "0.00"}
                   </p>
                 </div>
-                <Button className="w-full h-14 rounded-xl bg-primary text-lg font-semibold text-primary-foreground hover:bg-primary/80">
-                  <Gift className="size-5 mr-2.5" />
-                  Collect Earnings
+                <Button
+                  className="w-full h-14 rounded-xl bg-primary text-lg font-semibold text-primary-foreground hover:bg-primary/80"
+                  disabled={parseFloat(pendingDiv) <= 0 || isLoading || !authenticated}
+                  onClick={handleClaim}
+                >
+                  {isLoading ? (
+                    <Loader2 className="size-5 mr-2.5 animate-spin" />
+                  ) : (
+                    <Gift className="size-5 mr-2.5" />
+                  )}
+                  {isLoading ? "Claiming..." : "Collect Earnings"}
                 </Button>
                 <p className="text-xs text-muted-foreground">
                   Next payment expected: Apr 15, 2026
