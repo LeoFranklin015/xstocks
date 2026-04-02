@@ -99,7 +99,7 @@ function OrderForm({
           onClick={() => setTab("long")}
           className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-sm font-medium transition-colors ${
             tab === "long"
-              ? "text-[#c8ff00] border-b-2 border-[#c8ff00]"
+              ? "text-primary border-b-2 border-primary"
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
@@ -230,7 +230,7 @@ function OrderForm({
             step={0.1}
             value={leverage}
             onChange={(e) => setLeverage(parseFloat(e.target.value))}
-            className="w-full h-1.5 rounded-full appearance-none bg-muted cursor-pointer accent-[#c8ff00]"
+            className="w-full h-1.5 rounded-full appearance-none bg-muted cursor-pointer accent-primary"
           />
 
           <div className="flex gap-1.5">
@@ -240,7 +240,7 @@ function OrderForm({
                 onClick={() => setLeverage(p)}
                 className={`flex-1 py-1 rounded text-[10px] font-medium transition-colors ${
                   leverage === p
-                    ? "bg-[#c8ff00]/15 text-[#c8ff00] border border-[#c8ff00]/30"
+                    ? "bg-primary/15 text-primary border border-primary/30"
                     : "bg-muted/30 text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -339,7 +339,7 @@ function OrderForm({
         <Button
           className={`w-full h-11 font-medium text-sm ${
             tab === "long"
-              ? "bg-[#c8ff00] text-[#0a0a0a] hover:bg-[#c8ff00]/80"
+              ? "bg-primary text-primary-foreground hover:bg-primary/80"
               : "bg-red-500 text-white hover:bg-red-600"
           }`}
           disabled={payNum <= 0}
@@ -370,7 +370,7 @@ function ExpertDetail({ asset }: { asset: Asset }) {
   return (
     <div className="flex flex-col h-full">
       {/* Top bar with asset info */}
-      <div className="flex items-center gap-3 px-4 py-2.5 border-b border-border/50 bg-[#0e0e0e]/60">
+      <div className="flex items-center gap-3 px-4 py-2.5 border-b border-border/50 bg-sidebar/60">
         <Link
           href="/app/markets"
           className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/30"
@@ -391,7 +391,7 @@ function ExpertDetail({ asset }: { asset: Asset }) {
         </span>
         <span
           className={`text-sm font-medium ${
-            positive ? "text-[#c8ff00]" : "text-red-500"
+            positive ? "text-primary" : "text-red-500"
           }`}
         >
           {positive ? "+" : ""}
@@ -405,7 +405,7 @@ function ExpertDetail({ asset }: { asset: Asset }) {
           </div>
           <div>
             <span className="mr-1">Change</span>
-            <span className={positive ? "text-[#c8ff00]" : "text-red-500"}>
+            <span className={positive ? "text-primary" : "text-red-500"}>
               ${Math.abs(asset.change).toFixed(2)}
             </span>
           </div>
@@ -513,7 +513,7 @@ function ExpertDetail({ asset }: { asset: Asset }) {
         </div>
 
         {/* Right: Order form */}
-        <div className="hidden md:flex w-[320px] border-l border-border/50 flex-col bg-[#0a0a0a]">
+        <div className="hidden md:flex w-[320px] border-l border-border/50 flex-col bg-background">
           <OrderForm
             asset={asset}
             stopLoss={stopLoss}
@@ -580,7 +580,7 @@ function GrandmaDetail({ asset }: { asset: Asset }) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Link href="/app/vault" className="block">
-          <Button className="w-full h-12 bg-[#c8ff00] text-[#0a0a0a] hover:bg-[#c8ff00]/80 font-medium text-sm">
+          <Button className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/80 font-medium text-sm">
             Go to Savings Vault
           </Button>
         </Link>

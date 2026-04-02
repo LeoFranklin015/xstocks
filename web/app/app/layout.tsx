@@ -98,16 +98,16 @@ function NavItem({
         whileHover={{ x: 4 }}
         className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
           active
-            ? "bg-[#c8ff00]/10 text-[#c8ff00]"
+            ? "bg-primary/10 text-primary"
             : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
         }`}
       >
-        <Icon className={`size-4 ${active ? "text-[#c8ff00]" : ""}`} />
+        <Icon className={`size-4 ${active ? "text-primary" : ""}`} />
         {label}
         {active && (
           <motion.div
             layoutId="nav-indicator"
-            className="ml-auto h-1.5 w-1.5 rounded-full bg-[#c8ff00]"
+            className="ml-auto h-1.5 w-1.5 rounded-full bg-primary"
           />
         )}
       </motion.div>
@@ -123,24 +123,24 @@ function ModeToggle() {
   return (
     <div
       onClick={toggleMode}
-      className="relative flex items-center h-9 rounded-full bg-[#111] border border-white/[0.07] cursor-pointer select-none overflow-hidden"
+      className="relative flex items-center h-9 rounded-full bg-[#eee] border border-black/[0.07] cursor-pointer select-none overflow-hidden"
     >
       {/* Sliding thumb */}
       <motion.div
-        className="absolute top-[3px] bottom-[3px] w-[calc(50%-5px)] rounded-full bg-[#222] border border-white/[0.10] shadow-sm"
+        className="absolute top-[3px] bottom-[3px] w-[calc(50%-5px)] rounded-full bg-white border border-black/[0.10] shadow-sm"
         animate={{ left: isGrandma ? "calc(50% + 2px)" : "3px" }}
         transition={{ type: "spring", stiffness: 380, damping: 30 }}
       />
       <span
         className={`relative z-10 flex-1 text-center text-xs font-medium transition-colors duration-200 ${
-          !isGrandma ? "text-[#c8ff00]" : "text-white/30"
+          !isGrandma ? "text-primary" : "text-black/30"
         }`}
       >
         Expert
       </span>
       <span
         className={`relative z-10 flex-1 text-center text-xs font-medium transition-colors duration-200 ${
-          isGrandma ? "text-pink-400" : "text-white/30"
+          isGrandma ? "text-pink-500" : "text-black/30"
         }`}
       >
         Simple
@@ -173,12 +173,12 @@ function WalletPanel({
   const faucetUrl = faucetUrls[selectedNetwork.id];
 
   return (
-    <div className="mx-3 rounded-xl bg-[#0a0a0a] border border-white/[0.05] overflow-hidden">
+    <div className="mx-3 rounded-xl bg-white border border-black/[0.05] overflow-hidden">
       {/* Network row */}
       <DropdownMenu>
         <DropdownMenuTrigger
           render={
-            <button className="flex items-center gap-2 w-full px-3 py-2.5 hover:bg-white/[0.03] transition-colors group" />
+            <button className="flex items-center gap-2 w-full px-3 py-2.5 hover:bg-black/[0.03] transition-colors group" />
           }
         >
           <span
@@ -202,22 +202,24 @@ function WalletPanel({
               <span className="size-2 rounded-full" style={{ backgroundColor: n.color }} />
               <span className="flex-1 text-sm">{n.name}</span>
               {selectedNetwork.id === n.id && (
-                <span className="size-1.5 rounded-full bg-[#c8ff00]" />
+                <span className="size-1.5 rounded-full bg-primary" />
+
               )}
             </DropdownMenuItem>
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <div className="h-px bg-white/[0.04] mx-3" />
+      <div className="h-px bg-black/[0.04] mx-3" />
 
       {/* Wallet row */}
       <div className="px-3 py-2.5 space-y-2">
         {authenticated && walletAddress ? (
           <>
             <div className="flex items-center gap-2">
-              <div className="size-6 rounded-full bg-[#c8ff00]/10 flex items-center justify-center shrink-0">
-                <Wallet className="size-3 text-[#c8ff00]" />
+              <div className="size-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                <Wallet className="size-3 text-primary" />
+
               </div>
               <span className="font-mono text-xs text-foreground">
                 {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
@@ -235,7 +237,7 @@ function WalletPanel({
           <Button
             size="sm"
             onClick={login}
-            className="w-full bg-[#c8ff00] text-[#0a0a0a] hover:bg-[#c8ff00]/80 font-medium text-xs h-8"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/80 font-medium text-xs h-8"
           >
             Connect Wallet
           </Button>
@@ -247,7 +249,7 @@ function WalletPanel({
             href={`${faucetUrl}${walletAddress ? `?address=${walletAddress}` : ""}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-1.5 w-full text-[11px] text-[#c8ff00]/70 hover:text-[#c8ff00] transition-colors py-0.5"
+            className="flex items-center justify-center gap-1.5 w-full text-[11px] text-primary/80 hover:text-primary transition-colors py-0.5"
           >
             <Droplets className="size-3" />
             Get testnet ETH
@@ -366,14 +368,14 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-56 flex-col border-r border-border/50 bg-[#0e0e0e]">
+      <aside className="hidden md:flex w-56 flex-col border-r border-border/50 bg-sidebar">
         <SidebarContent {...sidebarProps} />
       </aside>
 
       {/* Mobile sidebar */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         <div className="md:hidden" />
-        <SheetContent side="left" className="w-56 p-0 bg-[#0e0e0e]">
+        <SheetContent side="left" className="w-56 p-0 bg-sidebar">
           <SheetHeader className="sr-only">
             <SheetTitle>Navigation</SheetTitle>
           </SheetHeader>
@@ -384,7 +386,7 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
       {/* Main area */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top bar */}
-        <header className="flex h-14 items-center gap-3 border-b border-border/50 bg-[#0e0e0e]/80 backdrop-blur-sm px-4">
+        <header className="flex h-14 items-center gap-3 border-b border-border/50 bg-sidebar/80 backdrop-blur-sm px-4">
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger
               render={

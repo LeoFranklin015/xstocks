@@ -163,19 +163,20 @@ function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ delay: index * 0.06, duration: 0.4 }}
-      className="border-b border-white/[0.06] last:border-b-0"
+      className="border-b border-black/[0.06] last:border-b-0"
     >
       <button
         type="button"
         onClick={() => setOpen(!open)}
         className="flex w-full items-center justify-between gap-4 py-5 text-left group"
       >
-        <span className="text-sm font-medium text-foreground sm:text-base group-hover:text-[#c8ff00] transition-colors">
+        <span className="text-sm font-medium text-foreground sm:text-base group-hover:text-primary transition-colors">
           {q}
         </span>
         <ChevronDown
           className={`size-4 shrink-0 text-muted-foreground transition-transform duration-200 ${
-            open ? "rotate-180 text-[#c8ff00]" : ""
+            open ? "rotate-180 text-primary" : ""
+
           }`}
         />
       </button>
@@ -208,10 +209,10 @@ export default function Home() {
       {/* ----------------------------------------------------------------- */}
       {/* Hero                                                              */}
       {/* ----------------------------------------------------------------- */}
-      <section className="relative overflow-hidden bg-[#0a0a0a]">
+      <section className="relative overflow-hidden bg-background">
         <div className="pointer-events-none absolute inset-0 z-0">
           <LiquidEther
-            colors={["#141414", "#c8ff00", "#3d5200"]}
+            colors={["#e8e8e8", "#4d7a00", "#8fd400"]}
             resolution={0.45}
             mouseForce={18}
             autoSpeed={0.45}
@@ -219,7 +220,7 @@ export default function Home() {
         </div>
         {/* Legibility: darken behind copy (left), keep ether visible on the right */}
         <div
-          className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_90%_120%_at_0%_40%,#0a0a0a_0%,transparent_55%),radial-gradient(ellipse_at_70%_30%,transparent_20%,#0a0a0a_75%)]"
+          className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_90%_120%_at_0%_40%,#ffffff_0%,transparent_55%),radial-gradient(ellipse_at_70%_30%,transparent_20%,#ffffff_75%)]"
         />
 
         <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-4 pb-16 pt-28 sm:px-6 lg:grid-cols-2 lg:gap-10 lg:px-8 lg:pt-36 lg:pb-24">
@@ -232,19 +233,19 @@ export default function Home() {
             >
               <Badge
                 variant="outline"
-                className="border-[#c8ff00]/30 bg-[#c8ff00]/5 px-3 py-1 font-mono text-[#c8ff00]"
+                className="border-primary/30 bg-primary/5 px-3 py-1 font-mono text-primary"
               >
                 dx = dividend rights
               </Badge>
               <Badge
                 variant="outline"
-                className="border-white/15 bg-white/[0.03] px-3 py-1 font-mono text-muted-foreground"
+                className="border-black/15 bg-black/[0.03] px-3 py-1 font-mono text-muted-foreground"
               >
                 px = principal / price
               </Badge>
               <Badge
                 variant="outline"
-                className="border-white/15 bg-white/[0.03] px-3 py-1 text-xs text-muted-foreground"
+                className="border-black/15 bg-black/[0.03] px-3 py-1 text-xs text-muted-foreground"
               >
                 Base + Pyth
               </Badge>
@@ -256,7 +257,7 @@ export default function Home() {
               transition={{ delay: 0.3, duration: 0.7 }}
               className="font-[family-name:var(--font-safira)] text-4xl leading-[1.08] tracking-tight  md:text-6xl"
             >
-              <span className="text-[#c8ff00] glow-lime-text">yield </span>
+              <span className="text-primary glow-lime-text">yield </span>
               tokenization for capital efficiency
             </motion.h1>
 
@@ -289,7 +290,7 @@ export default function Home() {
             >
               <Link
                 href="/app"
-                className={buttonVariants({ size: "lg", className: "bg-[#c8ff00] text-[#0a0a0a] hover:bg-[#c8ff00]/80 font-semibold px-6" })}
+                className={buttonVariants({ size: "lg", className: "bg-primary text-primary-foreground hover:bg-primary/80 font-semibold px-6" })}
               >
                 Open app
                 <ArrowRight className="ml-1 size-4" />
@@ -333,10 +334,10 @@ export default function Home() {
                 viewport={{ once: true, margin: "-60px" }}
                 transition={{ delay: i * 0.15, duration: 0.6 }}
               >
-                <Card className="relative h-full border-l-2 border-l-[#c8ff00]/40 bg-card/60">
+                <Card className="relative h-full border-l-2 border-l-primary/40 bg-card/60">
                   <CardHeader>
                     <div className="flex items-center gap-3">
-                      <span className="font-[family-name:var(--font-safira)] text-2xl text-[#c8ff00]">
+                      <span className="font-[family-name:var(--font-safira)] text-2xl text-primary">
                         {step.num}
                       </span>
                       <Icon className="size-5 text-muted-foreground" />
@@ -381,11 +382,11 @@ export default function Home() {
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.6 }}
           >
-            <Card className="h-full border-t-2 border-t-[#c8ff00]/60">
+            <Card className="h-full border-t-2 border-t-primary/60">
               <CardHeader>
                 <div className="flex items-center gap-2">
-                  <div className="flex size-10 items-center justify-center rounded-lg bg-[#c8ff00]/10">
-                    <DollarSign className="size-5 text-[#c8ff00]" />
+                  <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
+                    <DollarSign className="size-5 text-primary" />
                   </div>
                   <div>
                     <Badge variant="outline" className="text-xs font-mono">
@@ -404,7 +405,7 @@ export default function Home() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="rounded-lg bg-muted/50 p-3">
                     <p className="text-xs text-muted-foreground">Yield</p>
-                    <p className="mt-1 text-lg font-semibold text-[#c8ff00]">
+                    <p className="mt-1 text-lg font-semibold text-primary">
                       Rebase-linked
                     </p>
                   </div>
@@ -432,11 +433,11 @@ export default function Home() {
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.6 }}
           >
-            <Card className="h-full border-t-2 border-t-[#c8ff00]/60">
+            <Card className="h-full border-t-2 border-t-primary/60">
               <CardHeader>
                 <div className="flex items-center gap-2">
-                  <div className="flex size-10 items-center justify-center rounded-lg bg-[#c8ff00]/10">
-                    <TrendingUp className="size-5 text-[#c8ff00]" />
+                  <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
+                    <TrendingUp className="size-5 text-primary" />
                   </div>
                   <div>
                     <Badge variant="outline" className="text-xs font-mono">
@@ -456,7 +457,7 @@ export default function Home() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="rounded-lg bg-muted/50 p-3">
                     <p className="text-xs text-muted-foreground">Exposure</p>
-                    <p className="mt-1 text-lg font-semibold text-[#c8ff00]">
+                    <p className="mt-1 text-lg font-semibold text-primary">
                       Leveraged spot
                     </p>
                   </div>
@@ -505,8 +506,8 @@ export default function Home() {
               >
                 <Card className="h-full bg-card/60">
                   <CardHeader>
-                    <div className="flex size-10 items-center justify-center rounded-lg bg-[#c8ff00]/10">
-                      <Icon className="size-5 text-[#c8ff00]" />
+                    <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10">
+                      <Icon className="size-5 text-primary" />
                     </div>
                     <CardTitle className="mt-2">
                       {p.name}{" "}
@@ -557,8 +558,8 @@ export default function Home() {
         <div className="grid gap-12 lg:grid-cols-[1fr_1.5fr] lg:gap-16">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="flex size-8 items-center justify-center rounded-lg bg-[#c8ff00]/10">
-                <HelpCircle className="size-4 text-[#c8ff00]" />
+              <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10">
+                <HelpCircle className="size-4 text-primary" />
               </div>
               <Badge variant="secondary">FAQ</Badge>
             </div>
@@ -571,7 +572,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="rounded-xl border border-white/[0.06] bg-card/40 px-6">
+          <div className="rounded-xl border border-black/[0.06] bg-card/40 px-6">
             {faqs.map((faq, i) => (
               <FaqItem key={faq.q} q={faq.q} a={faq.a} index={i} />
             ))}
@@ -583,11 +584,11 @@ export default function Home() {
       {/* CTA Banner                                                        */}
       {/* ----------------------------------------------------------------- */}
       <Section className="relative overflow-hidden bg-grid">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,#0a0a0a_70%)]" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,#ffffff_70%)]" />
         <div className="relative mx-auto flex max-w-3xl flex-col items-center px-4 py-32 text-center sm:px-6 lg:px-8">
           <h2 className="font-[family-name:var(--font-safira)] text-4xl sm:text-5xl">
             Route yield and price{" "}
-            <span className="text-[#c8ff00] glow-lime-text">your way</span>
+            <span className="text-primary glow-lime-text">your way</span>
           </h2>
           <p className="mt-4 text-base text-muted-foreground">
             Explore the vault, markets, and docs. Mainnet rollout follows the
@@ -596,7 +597,7 @@ export default function Home() {
           <div className="mt-10">
             <Link
               href="/app"
-              className={buttonVariants({ size: "lg", className: "bg-[#c8ff00] text-[#0a0a0a] hover:bg-[#c8ff00]/80 font-semibold px-8" })}
+              className={buttonVariants({ size: "lg", className: "bg-primary text-primary-foreground hover:bg-primary/80 font-semibold px-8" })}
             >
               Open app
               <ArrowRight className="ml-1 size-4" />

@@ -162,11 +162,11 @@ function ExpertPortfolio() {
                 <motion.div
                   key={token.symbol}
                   whileHover={{ scale: 1.02 }}
-                  className="rounded-lg bg-muted/30 p-3 border border-border/50 hover:border-[#c8ff00]/20 transition-colors"
+                  className="rounded-lg bg-muted/30 p-3 border border-border/50 hover:border-primary/20 transition-colors"
                 >
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="size-7 rounded-full bg-[#c8ff00]/10 flex items-center justify-center">
-                      <Coins className="size-3.5 text-[#c8ff00]" />
+                    <div className="size-7 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Coins className="size-3.5 text-primary" />
                     </div>
                     <div>
                       <p className="text-sm font-medium">{token.symbol}</p>
@@ -235,19 +235,19 @@ function ExpertPortfolio() {
                         >
                           <stop
                             offset="0%"
-                            stopColor="#c8ff00"
+                            stopColor="#4d7a00"
                             stopOpacity={0.3}
                           />
                           <stop
                             offset="100%"
-                            stopColor="#c8ff00"
+                            stopColor="#4d7a00"
                             stopOpacity={0}
                           />
                         </linearGradient>
                       </defs>
                       <CartesianGrid
                         strokeDasharray="3 3"
-                        stroke="rgba(255,255,255,0.05)"
+                        stroke="rgba(0,0,0,0.06)"
                       />
                       <XAxis
                         dataKey="day"
@@ -264,8 +264,8 @@ function ExpertPortfolio() {
                       />
                       <RechartsTooltip
                         contentStyle={{
-                          backgroundColor: "#111",
-                          border: "1px solid rgba(255,255,255,0.1)",
+                          backgroundColor: "#fff",
+                          border: "1px solid rgba(0,0,0,0.1)",
                           borderRadius: 8,
                           fontSize: 12,
                         }}
@@ -277,7 +277,7 @@ function ExpertPortfolio() {
                       <Area
                         type="monotone"
                         dataKey="value"
-                        stroke="#c8ff00"
+                        stroke="#4d7a00"
                         strokeWidth={2}
                         fill="url(#portfolioGradient)"
                       />
@@ -376,23 +376,23 @@ function ExpertPortfolio() {
         <div className="space-y-4">
           {/* Claim dividends */}
           <motion.div {...fadeUp} transition={{ delay: 0.2 }}>
-            <Card className="border-[#c8ff00]/20">
+            <Card className="border-primary/20">
               <CardHeader className="px-4 pt-4 pb-2">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <Gift className="size-4 text-[#c8ff00]" />
+                  <Gift className="size-4 text-primary" />
                   Claim Dividends
                 </CardTitle>
               </CardHeader>
               <CardContent className="px-4 pb-4 pt-0 space-y-3">
-                <div className="rounded-lg bg-[#c8ff00]/5 p-4 text-center">
+                <div className="rounded-lg bg-primary/5 p-4 text-center">
                   <p className="text-xs text-muted-foreground mb-1">
                     Pending Dividends
                   </p>
-                  <p className="text-2xl font-semibold text-[#c8ff00] font-mono tracking-tight">
+                  <p className="text-2xl font-semibold text-primary font-mono tracking-tight">
                     {pendingDividends}
                   </p>
                 </div>
-                <Button className="w-full bg-[#c8ff00] text-[#0a0a0a] hover:bg-[#c8ff00]/80 font-medium">
+                <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/80 font-medium">
                   <Gift className="size-4 mr-1.5" />
                   Claim {pendingDividends}
                 </Button>
@@ -435,7 +435,7 @@ function ExpertPortfolio() {
                   <span className="text-muted-foreground">
                     Total Earned (All Time)
                   </span>
-                  <span className="font-medium font-mono text-[#c8ff00]">
+                  <span className="font-medium font-mono text-primary">
                     $71.38
                   </span>
                 </div>
@@ -472,7 +472,7 @@ function GrandmaPortfolio() {
 
       {/* Big total value */}
       <motion.div {...fadeUp} transition={{ delay: 0.05 }}>
-        <Card className="border-[#c8ff00]/20">
+        <Card className="border-primary/20">
           <CardContent className="p-6 text-center">
             <p className="text-sm text-muted-foreground mb-2">Total Value</p>
             <p className="text-4xl font-semibold tracking-tight">{totalValue}</p>
@@ -489,8 +489,8 @@ function GrandmaPortfolio() {
                 {i > 0 && <Separator className="opacity-30" />}
                 <div className="flex items-center justify-between px-5 py-4">
                   <div className="flex items-center gap-3">
-                    <div className="size-9 rounded-full bg-[#c8ff00]/10 flex items-center justify-center">
-                      <Coins className="size-4 text-[#c8ff00]" />
+                    <div className="size-9 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Coins className="size-4 text-primary" />
                     </div>
                     <div>
                       <p className="text-sm font-medium">{item.label}</p>
@@ -509,16 +509,16 @@ function GrandmaPortfolio() {
 
       {/* Earnings claim */}
       <motion.div {...fadeUp} transition={{ delay: 0.15 }}>
-        <Card className="border-[#c8ff00]/20">
+        <Card className="border-primary/20">
           <CardContent className="p-6 text-center space-y-3">
-            <Gift className="size-8 text-[#c8ff00] mx-auto" />
+            <Gift className="size-8 text-primary mx-auto" />
             <div>
               <p className="text-sm text-muted-foreground">Earnings Ready to Collect</p>
-              <p className="text-3xl font-semibold text-[#c8ff00] font-mono tracking-tight mt-1">
+              <p className="text-3xl font-semibold text-primary font-mono tracking-tight mt-1">
                 {pendingDividends}
               </p>
             </div>
-            <Button className="w-full bg-[#c8ff00] text-[#0a0a0a] hover:bg-[#c8ff00]/80 font-medium">
+            <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/80 font-medium">
               <Gift className="size-4 mr-2" />
               Collect Earnings
             </Button>

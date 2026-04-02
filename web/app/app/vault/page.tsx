@@ -74,8 +74,8 @@ function DepositTab() {
         </p>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="size-6 rounded-full bg-[#c8ff00]/20 flex items-center justify-center">
-              <Coins className="size-3 text-[#c8ff00]" />
+            <div className="size-6 rounded-full bg-primary/20 flex items-center justify-center">
+              <Coins className="size-3 text-primary" />
             </div>
             <span className="text-sm">xdSPY (Income)</span>
           </div>
@@ -85,8 +85,8 @@ function DepositTab() {
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="size-6 rounded-full bg-[#c8ff00]/20 flex items-center justify-center">
-              <Coins className="size-3 text-[#c8ff00]" />
+            <div className="size-6 rounded-full bg-primary/20 flex items-center justify-center">
+              <Coins className="size-3 text-primary" />
             </div>
             <span className="text-sm">xpSPY (Price)</span>
           </div>
@@ -106,7 +106,7 @@ function DepositTab() {
       </div>
 
       <Button
-        className="w-full h-10 bg-[#c8ff00] text-[#0a0a0a] hover:bg-[#c8ff00]/80 font-medium"
+        className="w-full h-10 bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
         disabled={numAmount <= 0}
       >
         <ArrowDownToLine className="size-4 mr-2" />
@@ -177,7 +177,7 @@ function WithdrawTab() {
       </div>
 
       <Button
-        className="w-full h-10 bg-[#c8ff00] text-[#0a0a0a] hover:bg-[#c8ff00]/80 font-medium"
+        className="w-full h-10 bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
         disabled={!xdAmount || parseFloat(xdAmount) <= 0}
       >
         <ArrowUpFromLine className="size-4 mr-2" />
@@ -226,8 +226,8 @@ function HowItWorks() {
                   <div className="hidden lg:block absolute top-4 left-[calc(100%_-_8px)] w-4 h-px bg-border/60 z-0" />
                 )}
                 <div className="flex items-center gap-2">
-                  <div className="size-7 rounded-full bg-[#c8ff00]/10 border border-[#c8ff00]/20 flex items-center justify-center shrink-0 z-10">
-                    <span className="text-[11px] font-semibold text-[#c8ff00]">{s.step}</span>
+                  <div className="size-7 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 z-10">
+                    <span className="text-[11px] font-semibold text-primary">{s.step}</span>
                   </div>
                   <p className="text-sm font-medium">{s.title}</p>
                 </div>
@@ -335,10 +335,10 @@ function ExpertVault() {
           </motion.div>
 
           <motion.div {...fadeUp} transition={{ delay: 0.15 }}>
-            <Card className="border-[#c8ff00]/20">
+            <Card className="border-primary/20">
               <CardHeader className="px-4 pt-4 pb-2">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <Gift className="size-4 text-[#c8ff00]" />
+                  <Gift className="size-4 text-primary" />
                   Dividends
                 </CardTitle>
               </CardHeader>
@@ -355,7 +355,7 @@ function ExpertVault() {
                   <span className="text-xs text-muted-foreground">
                     Estimated Amount
                   </span>
-                  <span className="text-sm font-medium font-mono text-[#c8ff00]">
+                  <span className="text-sm font-medium font-mono text-primary">
                     $14.63
                   </span>
                 </div>
@@ -364,12 +364,12 @@ function ExpertVault() {
                   <span className="text-xs text-muted-foreground">
                     Pending (Claimable)
                   </span>
-                  <span className="text-sm font-medium font-mono text-[#c8ff00]">
+                  <span className="text-sm font-medium font-mono text-primary">
                     $8.22
                   </span>
                 </div>
                 <Button
-                  className="w-full mt-1 bg-[#c8ff00] text-[#0a0a0a] hover:bg-[#c8ff00]/80 font-medium"
+                  className="w-full mt-1 bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
                   size="sm"
                 >
                   <Gift className="size-3.5 mr-1.5" />
@@ -410,10 +410,10 @@ function GrandmaVault() {
             { icon: "3", title: "Earn payments", desc: "Income token pays out regularly" },
             { icon: "4", title: "Take money out", desc: "Return both tokens to get xSPY back" },
           ].map((s) => (
-            <Card key={s.icon} className="bg-[#0a0a0a]">
+            <Card key={s.icon} className="bg-background">
               <CardContent className="p-4">
-                <div className="size-8 rounded-full bg-[#c8ff00]/10 flex items-center justify-center mb-2">
-                  <span className="text-xs font-bold text-[#c8ff00]">{s.icon}</span>
+                <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                  <span className="text-xs font-bold text-primary">{s.icon}</span>
                 </div>
                 <p className="text-sm font-medium">{s.title}</p>
                 <p className="text-xs text-muted-foreground mt-0.5">{s.desc}</p>
@@ -425,10 +425,10 @@ function GrandmaVault() {
 
       {/* Put Money In */}
       <motion.div {...fadeUp} transition={{ delay: 0.1 }}>
-        <Card className="border-[#c8ff00]/20">
+        <Card className="border-primary/20">
           <CardHeader className="px-5 pt-5 pb-3">
             <CardTitle className="text-base font-medium flex items-center gap-2">
-              <ArrowDownToLine className="size-5 text-[#c8ff00]" />
+              <ArrowDownToLine className="size-5 text-primary" />
               Put Money In
             </CardTitle>
           </CardHeader>
@@ -449,7 +449,7 @@ function GrandmaVault() {
               </p>
             </div>
             <Button
-              className="w-full h-11 bg-[#c8ff00] text-[#0a0a0a] hover:bg-[#c8ff00]/80 font-medium text-sm"
+              className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/80 font-medium text-sm"
               disabled={depositNum <= 0}
             >
               Deposit
@@ -496,16 +496,16 @@ function GrandmaVault() {
 
       {/* Earnings */}
       <motion.div {...fadeUp} transition={{ delay: 0.2 }}>
-        <Card className="border-[#c8ff00]/20">
+        <Card className="border-primary/20">
           <CardContent className="p-5 text-center space-y-3">
-            <Gift className="size-8 text-[#c8ff00] mx-auto" />
+            <Gift className="size-8 text-primary mx-auto" />
             <div>
               <p className="text-sm text-muted-foreground">Your Earnings</p>
-              <p className="text-3xl font-semibold text-[#c8ff00] font-mono tracking-tight mt-1">
+              <p className="text-3xl font-semibold text-primary font-mono tracking-tight mt-1">
                 $8.22
               </p>
             </div>
-            <Button className="w-full bg-[#c8ff00] text-[#0a0a0a] hover:bg-[#c8ff00]/80 font-medium">
+            <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/80 font-medium">
               <Gift className="size-4 mr-2" />
               Collect Earnings
             </Button>

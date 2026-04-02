@@ -35,7 +35,7 @@ const columns = [
 
 export default function Footer() {
   return (
-    <footer className="relative overflow-hidden bg-[#050505] border-t border-border">
+    <footer className="relative overflow-hidden bg-[#f5f5f5] border-t border-border">
       {/* Giant XSTREAME watermark -- replicates the Maple footer style */}
       <div
         aria-hidden
@@ -47,7 +47,7 @@ export default function Footer() {
           style={{
             fontSize: "clamp(120px, 18vw, 360px)",
             background:
-              "linear-gradient(180deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 100%)",
+              "linear-gradient(180deg, rgba(0,0,0,0.06) 0%, rgba(0,0,0,0.02) 100%)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             backgroundClip: "text",
@@ -71,14 +71,14 @@ export default function Footer() {
             <div className="mt-5 flex items-center gap-3">
               <Link
                 href="https://twitter.com/xstream"
-                className="flex size-8 items-center justify-center rounded-md bg-white/[0.04] text-muted-foreground transition-colors hover:bg-white/[0.08] hover:text-foreground"
+                className="flex size-8 items-center justify-center rounded-md bg-black/[0.04] text-muted-foreground transition-colors hover:bg-black/[0.08] hover:text-foreground"
                 aria-label="Twitter"
               >
                 <Send className="size-4" />
               </Link>
               <Link
                 href="https://github.com/xstream"
-                className="flex size-8 items-center justify-center rounded-md bg-white/[0.04] text-muted-foreground transition-colors hover:bg-white/[0.08] hover:text-foreground"
+                className="flex size-8 items-center justify-center rounded-md bg-black/[0.04] text-muted-foreground transition-colors hover:bg-black/[0.08] hover:text-foreground"
                 aria-label="GitHub"
               >
                 <Code2 className="size-4" />
@@ -109,7 +109,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/[0.06] pt-8 sm:flex-row">
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-black/[0.06] pt-8 sm:flex-row">
           <p className="text-xs text-muted-foreground">
             &copy; {new Date().getFullYear()} {APP_NAME_FULL}. All rights
             reserved.

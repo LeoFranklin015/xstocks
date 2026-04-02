@@ -48,8 +48,8 @@ function toVolumeData(data: Candle[]) {
     value: c.volume,
     color:
       c.close >= c.open
-        ? "rgba(200, 255, 0, 0.12)"
-        : "rgba(255, 68, 68, 0.12)",
+        ? "rgba(77, 122, 0, 0.15)"
+        : "rgba(220, 38, 38, 0.15)",
   }));
 }
 
@@ -74,36 +74,36 @@ export default function CandlestickChart({
 
     const chart = createChart(container, {
       layout: {
-        background: { type: ColorType.Solid, color: "#0a0a0a" },
-        textColor: "#888888",
+        background: { type: ColorType.Solid, color: "#ffffff" },
+        textColor: "#6b6b6b",
         fontFamily: "Inter, system-ui, sans-serif",
         fontSize: 11,
       },
       grid: {
-        vertLines: { color: "rgba(255, 255, 255, 0.03)" },
-        horzLines: { color: "rgba(255, 255, 255, 0.03)" },
+        vertLines: { color: "rgba(0, 0, 0, 0.04)" },
+        horzLines: { color: "rgba(0, 0, 0, 0.04)" },
       },
       crosshair: {
         mode: CrosshairMode.Normal,
         vertLine: {
-          color: "rgba(200, 255, 0, 0.2)",
+          color: "rgba(77, 122, 0, 0.3)",
           width: 1,
           style: LineStyle.Dashed,
-          labelBackgroundColor: "#1a1a1a",
+          labelBackgroundColor: "#f0f0f0",
         },
         horzLine: {
-          color: "rgba(200, 255, 0, 0.2)",
+          color: "rgba(77, 122, 0, 0.3)",
           width: 1,
           style: LineStyle.Dashed,
-          labelBackgroundColor: "#1a1a1a",
+          labelBackgroundColor: "#f0f0f0",
         },
       },
       rightPriceScale: {
-        borderColor: "rgba(255, 255, 255, 0.08)",
+        borderColor: "rgba(0, 0, 0, 0.08)",
         scaleMargins: { top: 0.05, bottom: 0.2 },
       },
       timeScale: {
-        borderColor: "rgba(255, 255, 255, 0.08)",
+        borderColor: "rgba(0, 0, 0, 0.08)",
         timeVisible: true,
         secondsVisible: false,
         fixLeftEdge: true,
@@ -114,12 +114,12 @@ export default function CandlestickChart({
 
     // Candlestick series
     const candleSeries = chart.addSeries(CandlestickSeries, {
-      upColor: "#c8ff00",
-      downColor: "#ff4444",
-      borderUpColor: "#c8ff00",
-      borderDownColor: "#ff4444",
-      wickUpColor: "#c8ff00",
-      wickDownColor: "#ff4444",
+      upColor: "#4d7a00",
+      downColor: "#dc2626",
+      borderUpColor: "#4d7a00",
+      borderDownColor: "#dc2626",
+      wickUpColor: "#4d7a00",
+      wickDownColor: "#dc2626",
     });
 
     // Volume series

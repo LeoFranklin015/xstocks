@@ -9,8 +9,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID!}
       config={{
         appearance: {
-          theme: "dark",
-          accentColor: "#c8ff00",
+          theme: "light",
+          accentColor: "#4d7a00",
           logo: "/logo-transparent.png",
         },
         loginMethods: ["wallet", "email"],

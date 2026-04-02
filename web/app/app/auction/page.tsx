@@ -147,7 +147,7 @@ function ListAuctionPanel({ onClose }: { onClose: () => void }) {
                       }}
                       className={`w-full flex items-center gap-2 px-3 py-2 text-sm text-left transition-colors ${
                         token === t.ticker
-                          ? "text-[#c8ff00] bg-muted/30"
+                          ? "text-primary bg-muted/30"
                           : "text-foreground hover:bg-muted/30"
                       }`}
                     >
@@ -195,7 +195,7 @@ function ListAuctionPanel({ onClose }: { onClose: () => void }) {
                 onClick={() => setQuarters(String(q))}
                 className={`flex-1 h-9 rounded-lg text-sm font-medium border transition-all ${
                   quarters === String(q)
-                    ? "border-[#c8ff00]/40 bg-[#c8ff00]/10 text-[#c8ff00]"
+                    ? "border-primary/40 bg-primary/10 text-primary"
                     : "border-border/50 text-muted-foreground hover:text-foreground hover:bg-muted/30"
                 }`}
               >
@@ -245,7 +245,7 @@ function ListAuctionPanel({ onClose }: { onClose: () => void }) {
 
       <div className="p-4 border-t border-border/50">
         <Button
-          className="w-full bg-[#c8ff00] text-[#0a0a0a] hover:bg-[#c8ff00]/80 font-medium"
+          className="w-full bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
           disabled={!token || !amount || !quarters || !startingPrice}
         >
           List for Auction
@@ -298,7 +298,7 @@ function AuctionDetailPanel({
               <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
                 Highest Bid
               </p>
-              <p className="text-xl font-semibold text-[#c8ff00] mt-1">
+              <p className="text-xl font-semibold text-primary mt-1">
                 ${auction.highestBid.toLocaleString()}
               </p>
               <p className="text-[10px] text-muted-foreground">USDC</p>
@@ -348,7 +348,7 @@ function AuctionDetailPanel({
                 className="h-9 bg-muted/30 border-border/50 flex-1"
               />
               <Button
-                className="bg-[#c8ff00] text-[#0a0a0a] hover:bg-[#c8ff00]/80 font-medium h-9 px-4"
+                className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium h-9 px-4"
                 disabled={!bidAmount}
               >
                 Bid
@@ -392,13 +392,13 @@ function BidRow({
   return (
     <div
       className={`flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors ${
-        isTop ? "bg-[#c8ff00]/5 ring-1 ring-[#c8ff00]/20" : "hover:bg-muted/20"
+        isTop ? "bg-primary/5 ring-1 ring-primary/20" : "hover:bg-muted/20"
       }`}
     >
       <div className="flex items-center gap-3">
         <span
           className={`text-xs font-mono w-5 text-center ${
-            isTop ? "text-[#c8ff00]" : "text-muted-foreground"
+            isTop ? "text-primary" : "text-muted-foreground"
           }`}
         >
           #{rank}
@@ -415,7 +415,7 @@ function BidRow({
       <div className="text-right">
         <p
           className={`text-sm font-medium ${
-            isTop ? "text-[#c8ff00]" : "text-foreground"
+            isTop ? "text-primary" : "text-foreground"
           }`}
         >
           ${bid.amount.toLocaleString()}
@@ -470,7 +470,7 @@ function AuctionCard({
             <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
               Highest Bid
             </p>
-            <p className="text-lg font-semibold text-[#c8ff00]">
+            <p className="text-lg font-semibold text-primary">
               {auction.highestBid > 0
                 ? `$${auction.highestBid.toLocaleString()}`
                 : "--"}
@@ -501,7 +501,7 @@ function AuctionCard({
           <p className="text-[10px] text-muted-foreground font-mono">
             {truncAddr(auction.seller)}
           </p>
-          <ArrowUpRight className="size-3.5 text-muted-foreground group-hover:text-[#c8ff00] transition-colors" />
+          <ArrowUpRight className="size-3.5 text-muted-foreground group-hover:text-primary transition-colors" />
         </div>
       </div>
     </Card>
@@ -538,7 +538,7 @@ function SlidePanel({
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed inset-y-0 right-0 z-50 w-full sm:w-[420px] bg-[#0e0e0e] border-l border-border/50 shadow-2xl"
+            className="fixed inset-y-0 right-0 z-50 w-full sm:w-[420px] bg-sidebar border-l border-border/50 shadow-2xl"
           >
             {children}
           </motion.div>
@@ -611,7 +611,7 @@ function AuctionPageInner() {
         </div>
         <Button
           onClick={openCreate}
-          className="bg-[#c8ff00] text-[#0a0a0a] hover:bg-[#c8ff00]/80 font-medium gap-1.5"
+          className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium gap-1.5"
         >
           <Plus className="size-4" />
           List Token

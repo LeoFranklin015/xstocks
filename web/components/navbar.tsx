@@ -59,7 +59,7 @@ export default function Navbar() {
           ) : (
             <Button
               size="sm"
-              className="bg-[#c8ff00] text-[#0a0a0a] hover:bg-[#c8ff00]/80 font-medium"
+              className="bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
               onClick={login}
             >
               Connect Wallet
@@ -105,7 +105,7 @@ export default function Navbar() {
                     </Button>
                   ) : (
                     <Button
-                      className="w-full bg-[#c8ff00] text-[#0a0a0a] hover:bg-[#c8ff00]/80 font-medium"
+                      className="w-full bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
                       onClick={() => {
                         login();
                         setOpen(false);

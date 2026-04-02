@@ -108,19 +108,19 @@ export default function TermsGate({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center bg-[#0a0a0a]/95 backdrop-blur-md p-4"
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-white/95 backdrop-blur-md p-4"
       >
         <motion.div
           initial={{ opacity: 0, y: 24, scale: 0.97 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ delay: 0.1, duration: 0.4, ease: "easeOut" }}
-          className="w-full max-w-2xl rounded-2xl border border-white/[0.06] bg-[#111111] shadow-2xl"
+          className="w-full max-w-2xl rounded-2xl border border-black/[0.08] bg-white shadow-2xl"
         >
           {/* Header */}
-          <div className="border-b border-white/[0.06] px-6 pt-6 pb-5">
+          <div className="border-b border-black/[0.06] px-6 pt-6 pb-5">
             <div className="flex items-center gap-3">
-              <div className="flex size-10 items-center justify-center rounded-xl bg-[#c8ff00]/10">
-                <ShieldCheck className="size-5 text-[#c8ff00]" />
+              <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10">
+                <ShieldCheck className="size-5 text-primary" />
               </div>
               <div>
                 <h2 className="font-[family-name:var(--font-safira)] text-xl tracking-tight">
@@ -152,18 +152,18 @@ export default function TermsGate({
           </div>
 
           {/* Accept */}
-          <div className="border-t border-white/[0.06] px-6 py-5 space-y-4">
+          <div className="border-t border-black/[0.06] px-6 py-5 space-y-4">
             <label className="flex items-start gap-3 cursor-pointer group">
               <button
                 type="button"
                 onClick={() => setChecked(!checked)}
                 className={`mt-0.5 flex size-5 shrink-0 items-center justify-center rounded border transition-colors ${
                   checked
-                    ? "border-[#c8ff00] bg-[#c8ff00]"
-                    : "border-white/20 bg-white/[0.04] group-hover:border-white/30"
+                    ? "border-primary bg-primary"
+                    : "border-black/20 bg-black/[0.04] group-hover:border-black/30"
                 }`}
               >
-                {checked && <Check className="size-3.5 text-[#0a0a0a]" />}
+                {checked && <Check className="size-3.5 text-white" />}
               </button>
               <span className="text-sm text-muted-foreground leading-snug">
                 I have read and agree to the Terms of Use, and I understand the
@@ -173,7 +173,7 @@ export default function TermsGate({
             <Button
               onClick={handleAccept}
               disabled={!checked}
-              className="w-full bg-[#c8ff00] text-[#0a0a0a] hover:bg-[#c8ff00]/80 font-semibold disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/80 font-semibold disabled:opacity-30 disabled:cursor-not-allowed"
             >
               Accept and Continue
             </Button>
