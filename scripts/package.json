@@ -1,0 +1,17 @@
+{
+  "name": "pendlex-scripts",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "deploy-wallets": "node setup-wallets.js",
+    "test:deposit": "node flows/01-deposit.js",
+    "test:trading": "node flows/02-trading.js",
+    "test:dividend": "node flows/03-dividend.js",
+    "test:liquidation": "node flows/04-liquidation.js",
+    "test:recombine": "node flows/05-recombine.js",
+    "test:all": "node flows/01-deposit.js && node flows/02-trading.js && node flows/03-dividend.js && node flows/04-liquidation.js && node flows/05-recombine.js"
+  },
+  "dependencies": {
+    "ethers": "^6.13.0"
+  }
+}
