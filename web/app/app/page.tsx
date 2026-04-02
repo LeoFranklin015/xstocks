@@ -9,7 +9,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
   Lock,
@@ -36,6 +35,11 @@ import {
   Cell,
 } from "recharts";
 import { useAppMode } from "@/lib/mode-context";
+import {
+  LiveVaultBalance,
+  DEMO_VAULT_PRINCIPAL,
+  DEMO_VAULT_APY_ANNUAL,
+} from "@/components/LiveVaultBalance";
 
 // Mock 30-day price data
 const priceData = Array.from({ length: 30 }, (_, i) => {
@@ -383,7 +387,6 @@ function ExpertDashboard() {
 }
 
 function GrandmaDashboard() {
-  const totalValue = "$12,450";
   const changePositive = true;
   const changeText = "+2.8%";
 
@@ -402,8 +405,17 @@ function GrandmaDashboard() {
       <motion.div {...fadeUp} transition={{ delay: 0.05 }}>
         <Card className="border-primary/20">
           <CardContent className="p-6 text-center">
-            <p className="text-sm text-muted-foreground mb-2">Your Total Balance</p>
-            <p className="text-4xl font-semibold tracking-tight">{totalValue}</p>
+            <p className="text-sm text-muted-foreground mb-2">
+              Savings Vault Balance
+            </p>
+            <div className="flex justify-center">
+              <LiveVaultBalance
+                principal={DEMO_VAULT_PRINCIPAL}
+                apyAnnual={DEMO_VAULT_APY_ANNUAL}
+                size="lg"
+                className="justify-center"
+              />
+            </div>
             <div className="flex items-center justify-center gap-1 mt-2">
               {changePositive ? (
                 <TrendingUp className="size-4 text-green-500" />

@@ -25,6 +25,11 @@ import {
 import { cn } from "@/lib/utils";
 import { useAppMode } from "@/lib/mode-context";
 import { xStockAssets, type Asset } from "@/lib/market-data";
+import {
+  LiveVaultBalance,
+  DEMO_VAULT_PRINCIPAL,
+  DEMO_VAULT_APY_ANNUAL,
+} from "@/components/LiveVaultBalance";
 
 const fadeUp = {
   initial: { opacity: 0, y: 12 },
@@ -32,75 +37,6 @@ const fadeUp = {
 };
 
 type VaultMode = "deposit" | "withdraw";
-
-/** Demo vault figures; balance accrual uses APY with continuous compounding. */
-const VAULT_BALANCE_PRINCIPAL = 100;
-const VAULT_APY_ANNUAL = 0.0482; // 4.82%
-
-const MS_PER_YEAR = 365.25 * 24 * 60 * 60 * 1000;
-
-function useAccruingElapsedMs(): number {
-  const [elapsedMs, setElapsedMs] = useState(0);
-  useEffect(() => {
-    const start = performance.now();
-    const id = setInterval(() => {
-      setElapsedMs(performance.now() - start);
-    }, 32);
-    return () => clearInterval(id);
-  }, []);
-  return elapsedMs;
-}
-
-function formatUsdLive(balance: number): { intFormatted: string; frac: string } {
-  const [intRaw, frac = "000000"] = balance.toFixed(6).split(".");
-  const intNum = parseInt(intRaw, 10);
-  return {
-    intFormatted: intNum.toLocaleString("en-US"),
-    frac: frac.padEnd(6, "0").slice(0, 6),
-  };
-}
-
-function LiveVaultBalance({
-  principal,
-  apyAnnual,
-  size = "md",
-  className,
-}: {
-  principal: number;
-  apyAnnual: number;
-  size?: "md" | "lg";
-  className?: string;
-}) {
-  const elapsedMs = useAccruingElapsedMs();
-  const balance =
-    principal * Math.exp(apyAnnual * (elapsedMs / MS_PER_YEAR));
-  const { intFormatted, frac } = formatUsdLive(balance);
-
-  const intCls =
-    size === "lg"
-      ? "text-4xl font-semibold text-foreground"
-      : "text-3xl font-bold text-foreground";
-
-  return (
-    <span
-      className={cn(
-        "inline-flex flex-wrap items-baseline gap-0 tabular-nums",
-        className
-      )}
-      title={`Balance accrues at ${(apyAnnual * 100).toFixed(2)}% APY (continuous compounding).`}
-    >
-      <span className={intCls}>${intFormatted}</span>
-      <span
-        className={cn(
-          intCls,
-          "font-mono tracking-tight text-primary/90"
-        )}
-      >
-        .{frac}
-      </span>
-    </span>
-  );
-}
 
 type VaultStat =
   | {
@@ -127,8 +63,8 @@ const vaultStats: VaultStat[] = [
   {
     kind: "live",
     label: "Vault Balance",
-    principal: VAULT_BALANCE_PRINCIPAL,
-    apyAnnual: VAULT_APY_ANNUAL,
+    principal: DEMO_VAULT_PRINCIPAL,
+    apyAnnual: DEMO_VAULT_APY_ANNUAL,
     icon: Lock,
     change: "+5.2%",
     positive: true,
@@ -693,8 +629,8 @@ function GrandmaVault() {
             <p className="text-sm text-muted-foreground mb-2">Vault Balance</p>
             <div className="flex justify-center">
               <LiveVaultBalance
-                principal={VAULT_BALANCE_PRINCIPAL}
-                apyAnnual={VAULT_APY_ANNUAL}
+                principal={DEMO_VAULT_PRINCIPAL}
+                apyAnnual={DEMO_VAULT_APY_ANNUAL}
                 size="lg"
                 className="justify-center"
               />
