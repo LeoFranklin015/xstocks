@@ -25,18 +25,18 @@ export function LogoWordmark({
   href = "/",
   className,
   iconSize = 32,
-  textClassName = "text-lg",
+  textClassName = "text-2xl",
   suffix,
   imageClassName,
 }: LogoWordmarkProps) {
   const dim =
-    iconSize <= 24 ? "h-6 w-6" : iconSize <= 28 ? "h-7 w-7" : "h-8 w-8";
+    iconSize <= 24 ? "h-6 w-6" : iconSize <= 28 ? "h-12 w-12" : "h-10 w-10";
 
   return (
     <Link
       href={href}
       className={cn(
-        "group flex items-center gap-2",
+        "group flex items-center justify-center gap-2",
         suffix && "gap-3",
         className
       )}
@@ -46,7 +46,7 @@ export function LogoWordmark({
         alt={`${APP_NAME} logo`}
         width={iconSize}
         height={iconSize}
-        className={cn(dim, imageClassName)}
+        className={cn(dim, imageClassName) + "filter invert -mb-2"}
       />
       <span
         className={cn(
@@ -54,8 +54,7 @@ export function LogoWordmark({
           textClassName
         )}
       >
-        {APP_NAME.slice(0, 1)}
-        <span className="text-[#c8ff00]">{APP_NAME.slice(1)}</span>
+        <span className="text-lime-900">{APP_NAME}</span>
       </span>
       {suffix}
     </Link>

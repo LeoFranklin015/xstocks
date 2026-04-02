@@ -23,7 +23,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
-import HeroSplitVisual from "@/components/landing/HeroSplitVisual";
+import Globe from "@/components/ui/globe";
 import CoreTechnology from "@/components/landing/CoreTechnology";
 
 // ---------------------------------------------------------------------------
@@ -173,10 +173,9 @@ function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
           {q}
         </span>
         <ChevronDown
-          className={`size-4 shrink-0 text-muted-foreground transition-transform duration-200 ${
-            open ? "rotate-180 text-primary" : ""
+          className={`size-4 shrink-0 text-muted-foreground transition-transform duration-200 ${open ? "rotate-180 text-primary" : ""
 
-          }`}
+            }`}
         />
       </button>
       <motion.div
@@ -209,8 +208,8 @@ export default function Home() {
       {/* Hero                                                              */}
       {/* ----------------------------------------------------------------- */}
       <section className="relative overflow-hidden bg-background">
-        <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-4 pb-16 pt-28 sm:px-6 lg:grid-cols-2 lg:gap-10 lg:px-8 lg:pt-36 lg:pb-24">
-          <div className="flex flex-col text-center lg:text-left">
+        <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-4 pb-16 sm:px-6 lg:grid-cols-2 lg:gap-10 lg:px-8 ">
+          <div className="mb-24 flex flex-col text-center justify-start items-start lg:text-left">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -240,38 +239,28 @@ export default function Home() {
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.7 }}
+              transition={{ delay: 0.28, duration: 0.7 }}
               className="font-[family-name:var(--font-safira)] text-4xl leading-[1.08] tracking-tight  md:text-6xl"
             >
-              <span className="text-primary glow-lime-text">yield </span>
+              <span className="text-primary glow-lime-text">Yield </span>
               tokenization for capital efficiency
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.45, duration: 0.6 }}
-              className="mt-5 max-w-xl text-lg font-medium leading-snug text-muted-foreground sm:text-xl lg:max-w-lg"
+              transition={{ delay: 0.4, duration: 0.6 }}
+              className="mt-5 max-w-xl text-base font-medium leading-snug text-muted-foreground sm:text-lg lg:max-w-lg"
             >
-              One ERC-20 becomes two: dx accrues dividends from rebases; px is
-              your levered, session-bound handle on spot. Trade them separately,
-              then burn both to redeem the underlying.
-            </motion.p>
-
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.55, duration: 0.6 }}
-              className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground/90 sm:text-base"
-            >
-              Built for tokenized equities like AAPL, ABT, and SPY xStocks --
-              not a wrapped CEX IOU, not a synthetic from thin air.
+              Split one xStock into dx (dividend rights) and px (session-bound
+              price). Lean into yield or hedge it, trade each leg, then recombine
+              to redeem. AAPL, ABT, and SPY on Base with Pyth.
             </motion.p>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7, duration: 0.6 }}
+              transition={{ delay: 0.55, duration: 0.6 }}
               className="mt-10 flex flex-wrap items-center justify-center gap-4 lg:justify-start"
             >
               <Link
@@ -290,9 +279,15 @@ export default function Home() {
             </motion.div>
           </div>
 
-          <div className="flex w-full justify-center lg:justify-end lg:pl-4">
-            <HeroSplitVisual />
-          </div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.35, duration: 0.65, ease: "easeOut" }}
+            className="flex w-full justify-center lg:justify-end lg:pl-4"
+            aria-hidden
+          >
+            <Globe className="w-full pb-[500px] max-w-[min(100%,560px)] lg:max-w-[min(100%,640px)]" />
+          </motion.div>
         </div>
       </section>
 
@@ -307,6 +302,11 @@ export default function Home() {
           <h2 className="font-[family-name:var(--font-safira)] text-3xl sm:text-4xl">
             From one xStock to two tokens
           </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+            Dividend-tokenization separates the right to upcoming dividends from
+            principal. Here that split is dx (yield) and px (price), routed
+            through the vault and markets below.
+          </p>
         </div>
 
         <div className="mt-16 grid gap-6 md:grid-cols-3">
@@ -553,8 +553,8 @@ export default function Home() {
               Frequently asked questions
             </h2>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground max-w-sm">
-              Everything you need to know about the xStream protocol, dx/px
-              tokens, and how to get started.
+              Practical answers on dx and px, session rules, and how xStream fits
+              the wider idea: give users the reins to dividend yield.
             </p>
           </div>
 
@@ -576,9 +576,10 @@ export default function Home() {
             Route yield and price{" "}
             <span className="text-primary glow-lime-text">your way</span>
           </h2>
-          <p className="mt-4 text-base text-muted-foreground">
-            Explore the vault, markets, and docs. Mainnet rollout follows the
-            roadmap in the PRD.
+          <p className="mt-4 max-w-xl text-base text-muted-foreground">
+            Explore the vault, markets, and docs. The same derivative logic that
+            powers huge TradFi interest and dividend markets is now composable
+            on-chain. Mainnet rollout follows the roadmap in the PRD.
           </p>
           <div className="mt-10">
             <Link

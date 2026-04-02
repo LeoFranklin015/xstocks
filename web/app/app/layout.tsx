@@ -45,8 +45,8 @@ import { ModeProvider, useAppMode } from "@/lib/mode-context";
 // ---- Network config (mirrors NetworkSelector but owned here for chain switching) ----
 
 const networks: Network[] = [
-  { id: "ink-sepolia", name: "Ink Sepolia",  shortName: "Ink Sepolia",  chainId: 763373,   color: "#7C3AED", isTestnet: true },
-  { id: "sepolia",     name: "Eth Sepolia",  shortName: "Eth Sepolia",  chainId: 11155111, color: "#627EEA", isTestnet: true },
+  { id: "ink-sepolia", name: "Ink Sepolia", shortName: "Ink Sepolia", chainId: 763373, color: "#7C3AED", isTestnet: true },
+  { id: "sepolia", name: "Eth Sepolia", shortName: "Eth Sepolia", chainId: 11155111, color: "#627EEA", isTestnet: true },
 ];
 
 function useNetwork() {
@@ -96,11 +96,10 @@ function NavItem({
     <Link href={href}>
       <motion.div
         whileHover={{ x: 4 }}
-        className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-          active
-            ? "bg-primary/10 text-primary"
-            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-        }`}
+        className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${active
+          ? "bg-primary/10 text-primary"
+          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+          }`}
       >
         <Icon className={`size-4 ${active ? "text-primary" : ""}`} />
         {label}
@@ -132,16 +131,14 @@ function ModeToggle() {
         transition={{ type: "spring", stiffness: 380, damping: 30 }}
       />
       <span
-        className={`relative z-10 flex-1 text-center text-xs font-medium transition-colors duration-200 ${
-          !isGrandma ? "text-primary" : "text-black/30"
-        }`}
+        className={`relative z-10 flex-1 text-center text-xs font-medium transition-colors duration-200 ${!isGrandma ? "text-primary" : "text-black/30"
+          }`}
       >
         Expert
       </span>
       <span
-        className={`relative z-10 flex-1 text-center text-xs font-medium transition-colors duration-200 ${
-          isGrandma ? "text-pink-500" : "text-black/30"
-        }`}
+        className={`relative z-10 flex-1 text-center text-xs font-medium transition-colors duration-200 ${isGrandma ? "" : "text-black/30"
+          }`}
       >
         Simple
       </span>

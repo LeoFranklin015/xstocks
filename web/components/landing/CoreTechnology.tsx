@@ -248,7 +248,7 @@ function YieldCurveSVG() {
             <line
               key={frac}
               x1={pad.l} y1={cy} x2={pad.l + iw} y2={cy}
-              stroke="white" strokeOpacity="0.05" strokeWidth="1" strokeDasharray="3 4"
+              stroke="#a1a1aa" strokeOpacity="0.35" strokeWidth="1" strokeDasharray="3 4"
             />
           );
         })}
@@ -288,13 +288,13 @@ function YieldCurveSVG() {
             x={pts[pts.length - 1][0] - 22}
             y={pts[pts.length - 1][1] - 22}
             width="44" height="16" rx="4"
-            fill="#1a2000" stroke="#c8ff00" strokeWidth="0.8" strokeOpacity="0.6"
+            fill="#f4f4f5" stroke="#4d7a00" strokeWidth="0.8" strokeOpacity="0.45"
           />
           <text
             x={pts[pts.length - 1][0]}
             y={pts[pts.length - 1][1] - 10}
             textAnchor="middle"
-            fill="#c8ff00"
+            fill="#3f6600"
             fontSize="7"
             fontWeight="700"
             fontFamily="monospace"
@@ -310,8 +310,8 @@ function YieldCurveSVG() {
             x={pad.l - 4}
             y={pad.t + ih - y * ih + 3}
             textAnchor="end"
-            fill="white"
-            fillOpacity="0.3"
+            fill="#52525b"
+            fillOpacity="0.85"
             fontSize="6.5"
             fontFamily="monospace"
           >
@@ -323,7 +323,7 @@ function YieldCurveSVG() {
         <line
           x1={pad.l} y1={pad.t + ih}
           x2={pad.l + iw} y2={pad.t + ih}
-          stroke="white" strokeOpacity="0.1" strokeWidth="1"
+          stroke="#a1a1aa" strokeOpacity="0.45" strokeWidth="1"
         />
 
         {/* X-axis label */}
@@ -331,8 +331,8 @@ function YieldCurveSVG() {
           x={pad.l + iw / 2}
           y={H - 4}
           textAnchor="middle"
-          fill="white"
-          fillOpacity="0.25"
+          fill="#71717a"
+          fillOpacity="0.9"
           fontSize="6"
           fontFamily="monospace"
         >
@@ -378,7 +378,8 @@ function SessionSVG() {
         <circle
           cx={cx} cy={cy} r={r}
           fill="none"
-          stroke="white" strokeOpacity="0.06"
+          stroke="#d4d4d8"
+          strokeOpacity="0.9"
           strokeWidth={strokeW}
         />
 
@@ -463,11 +464,11 @@ function SessionSVG() {
         <motion.text
           x={cx} y={cy + r + 22}
           textAnchor="middle"
-          fill="white"
-          fillOpacity="0.3"
+          fill="#71717a"
+          fillOpacity="0.95"
           fontSize="6"
           fontFamily="monospace"
-          animate={inView ? { opacity: [0, 0.3] } : { opacity: 0 }}
+          animate={inView ? { opacity: [0, 0.95] } : { opacity: 0 }}
           transition={{ duration: 0.5, delay: 1.8, repeat: Infinity, repeatDelay: 1.8 }}
         >
           session + borrow + settlement fees
@@ -513,11 +514,11 @@ export default function CoreTechnology() {
       initial={{ opacity: 0, y: 40 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.7, ease: "easeOut" }}
-      className="relative w-full overflow-hidden bg-[#050505] border-y border-white/[0.05]"
+      className="relative w-full overflow-hidden bg-muted/40 border-y border-border"
     >
-      {/* Subtle radial glow behind section */}
+      {/* Subtle radial tint behind section */}
       <div className="pointer-events-none absolute inset-0 z-0"
-        style={{ background: "radial-gradient(ellipse 70% 50% at 50% 50%, rgba(200,255,0,0.04) 0%, transparent 70%)" }}
+        style={{ background: "radial-gradient(ellipse 70% 50% at 50% 50%, rgba(77,122,0,0.06) 0%, transparent 70%)" }}
       />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
@@ -527,7 +528,7 @@ export default function CoreTechnology() {
             initial={{ opacity: 0, letterSpacing: "0.3em" }}
             animate={inView ? { opacity: 1, letterSpacing: "0.2em" } : {}}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="inline-block text-xs font-semibold tracking-[0.2em] text-[#c8ff00] uppercase mb-4"
+            className="inline-block text-xs font-semibold tracking-[0.2em] text-primary uppercase mb-4"
           >
             Core Technology
           </motion.span>
@@ -549,12 +550,12 @@ export default function CoreTechnology() {
               initial={{ opacity: 0, y: 30 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.3 + i * 0.15 }}
-              className="group relative rounded-2xl border border-white/[0.07] bg-[#0a0a0a] p-6 hover:border-[#c8ff00]/20 transition-colors"
+              className="group relative rounded-2xl border border-border bg-card p-6 shadow-sm hover:border-primary/25 transition-colors"
             >
               {/* Corner accent */}
               <div className="pointer-events-none absolute top-0 left-0 w-16 h-16 rounded-tl-2xl overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full"
-                  style={{ background: "linear-gradient(135deg, rgba(200,255,0,0.08) 0%, transparent 60%)" }}
+                  style={{ background: "linear-gradient(135deg, rgba(77,122,0,0.08) 0%, transparent 60%)" }}
                 />
               </div>
 
@@ -564,7 +565,7 @@ export default function CoreTechnology() {
               </div>
 
               {/* Tag */}
-              <span className="inline-block text-[10px] font-semibold tracking-widest uppercase text-[#c8ff00] mb-2 opacity-70">
+              <span className="inline-block text-[10px] font-semibold tracking-widest uppercase text-primary mb-2">
                 {panel.tag}
               </span>
 
