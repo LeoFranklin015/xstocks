@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Card,
   CardContent,
@@ -8,14 +9,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
   Lock,
   Wallet,
   TrendingUp,
+  TrendingDown,
   Radio,
   ArrowUpRight,
   ArrowDownRight,
+  ArrowDownToLine,
+  ArrowUpFromLine,
+  Gift,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -29,6 +35,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import { useAppMode } from "@/lib/mode-context";
 
 // Mock 30-day price data
 const priceData = Array.from({ length: 30 }, (_, i) => {
@@ -130,7 +137,7 @@ const fadeUp = {
   animate: { opacity: 1, y: 0 },
 };
 
-export default function DashboardPage() {
+function ExpertDashboard() {
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-7xl mx-auto">
       {/* Welcome */}
@@ -374,5 +381,140 @@ export default function DashboardPage() {
         </Card>
       </motion.div>
     </div>
+  );
+}
+
+function GrandmaDashboard() {
+  const totalValue = "$12,450";
+  const changePositive = true;
+  const changeText = "+2.8%";
+
+  return (
+    <div className="p-4 md:p-6 space-y-6 max-w-2xl mx-auto">
+      <motion.div {...fadeUp}>
+        <h1 className="font-[family-name:var(--font-safira)] text-2xl md:text-3xl tracking-tight">
+          Welcome back!
+        </h1>
+        <p className="text-muted-foreground text-sm mt-1">
+          Here is how your money is doing.
+        </p>
+      </motion.div>
+
+      {/* Big portfolio value card */}
+      <motion.div {...fadeUp} transition={{ delay: 0.05 }}>
+        <Card className="border-[#c8ff00]/20">
+          <CardContent className="p-6 text-center">
+            <p className="text-sm text-muted-foreground mb-2">Your Total Balance</p>
+            <p className="text-4xl font-semibold tracking-tight">{totalValue}</p>
+            <div className="flex items-center justify-center gap-1 mt-2">
+              {changePositive ? (
+                <TrendingUp className="size-4 text-green-500" />
+              ) : (
+                <TrendingDown className="size-4 text-red-500" />
+              )}
+              <span className={`text-sm font-medium ${changePositive ? "text-green-500" : "text-red-500"}`}>
+                {changeText} this month
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Simple 30-day chart */}
+      <motion.div {...fadeUp} transition={{ delay: 0.1 }}>
+        <Card>
+          <CardHeader className="px-4 pt-4 pb-2">
+            <CardTitle className="text-sm font-medium">Last 30 Days</CardTitle>
+          </CardHeader>
+          <CardContent className="px-2 pb-4 pt-0">
+            <div className="h-[200px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={priceData}>
+                  <defs>
+                    <linearGradient id="simpleGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#c8ff00" stopOpacity={0.3} />
+                      <stop offset="100%" stopColor="#c8ff00" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis
+                    dataKey="day"
+                    tick={{ fill: "#888", fontSize: 10 }}
+                    axisLine={false}
+                    tickLine={false}
+                    interval={6}
+                  />
+                  <RechartsTooltip
+                    contentStyle={{
+                      backgroundColor: "#111",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      borderRadius: 8,
+                      fontSize: 12,
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="price"
+                    stroke="#c8ff00"
+                    strokeWidth={2}
+                    fill="url(#simpleGrad)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Three big action buttons */}
+      <motion.div {...fadeUp} transition={{ delay: 0.15 }} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <Link href="/app/vault" className="block">
+          <Card className="hover:border-[#c8ff00]/30 transition-colors cursor-pointer h-full">
+            <CardContent className="p-6 flex flex-col items-center text-center gap-3">
+              <div className="size-12 rounded-full bg-[#c8ff00]/10 flex items-center justify-center">
+                <ArrowDownToLine className="size-6 text-[#c8ff00]" />
+              </div>
+              <p className="text-sm font-medium">Put Money In</p>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/app/vault" className="block">
+          <Card className="hover:border-[#c8ff00]/30 transition-colors cursor-pointer h-full">
+            <CardContent className="p-6 flex flex-col items-center text-center gap-3">
+              <div className="size-12 rounded-full bg-[#c8ff00]/10 flex items-center justify-center">
+                <ArrowUpFromLine className="size-6 text-[#c8ff00]" />
+              </div>
+              <p className="text-sm font-medium">Take Money Out</p>
+            </CardContent>
+          </Card>
+        </Link>
+        <Card className="hover:border-[#c8ff00]/30 transition-colors cursor-pointer">
+          <CardContent className="p-6 flex flex-col items-center text-center gap-3">
+            <div className="size-12 rounded-full bg-[#c8ff00]/10 flex items-center justify-center">
+              <Gift className="size-6 text-[#c8ff00]" />
+            </div>
+            <p className="text-sm font-medium">Collect Earnings</p>
+            <p className="text-xs text-muted-foreground">$8.22 available</p>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
+  );
+}
+
+export default function DashboardPage() {
+  const { mode } = useAppMode();
+
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={mode}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        {mode === "expert" ? <ExpertDashboard /> : <GrandmaDashboard />}
+      </motion.div>
+    </AnimatePresence>
   );
 }

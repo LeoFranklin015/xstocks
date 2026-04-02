@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Card,
   CardContent,
@@ -27,6 +27,7 @@ import {
   Tooltip as RechartsTooltip,
   CartesianGrid,
 } from "recharts";
+import { useAppMode } from "@/lib/mode-context";
 
 // Mock portfolio value over time
 const portfolioData = Array.from({ length: 60 }, (_, i) => {
@@ -126,7 +127,7 @@ const fadeUp = {
   animate: { opacity: 1, y: 0 },
 };
 
-export default function PortfolioPage() {
+function ExpertPortfolio() {
   const totalValue = "$51,032.50";
   const pendingDividends = "$8.22";
 
@@ -161,11 +162,11 @@ export default function PortfolioPage() {
                 <motion.div
                   key={token.symbol}
                   whileHover={{ scale: 1.02 }}
-                  className="rounded-lg bg-muted/30 p-3 border border-border/50 hover:border-[#c8ff00]/20 transition-colors"
+                  className="rounded-lg bg-muted/30 p-3 border border-border/50 hover:border-primary/20 transition-colors"
                 >
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="size-7 rounded-full bg-[#c8ff00]/10 flex items-center justify-center">
-                      <Coins className="size-3.5 text-[#c8ff00]" />
+                    <div className="size-7 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Coins className="size-3.5 text-primary" />
                     </div>
                     <div>
                       <p className="text-sm font-medium">{token.symbol}</p>
@@ -234,19 +235,19 @@ export default function PortfolioPage() {
                         >
                           <stop
                             offset="0%"
-                            stopColor="#c8ff00"
+                            stopColor="#4d7a00"
                             stopOpacity={0.3}
                           />
                           <stop
                             offset="100%"
-                            stopColor="#c8ff00"
+                            stopColor="#4d7a00"
                             stopOpacity={0}
                           />
                         </linearGradient>
                       </defs>
                       <CartesianGrid
                         strokeDasharray="3 3"
-                        stroke="rgba(255,255,255,0.05)"
+                        stroke="rgba(0,0,0,0.06)"
                       />
                       <XAxis
                         dataKey="day"
@@ -263,8 +264,8 @@ export default function PortfolioPage() {
                       />
                       <RechartsTooltip
                         contentStyle={{
-                          backgroundColor: "#111",
-                          border: "1px solid rgba(255,255,255,0.1)",
+                          backgroundColor: "#fff",
+                          border: "1px solid rgba(0,0,0,0.1)",
                           borderRadius: 8,
                           fontSize: 12,
                         }}
@@ -276,7 +277,7 @@ export default function PortfolioPage() {
                       <Area
                         type="monotone"
                         dataKey="value"
-                        stroke="#c8ff00"
+                        stroke="#4d7a00"
                         strokeWidth={2}
                         fill="url(#portfolioGradient)"
                       />
@@ -375,23 +376,23 @@ export default function PortfolioPage() {
         <div className="space-y-4">
           {/* Claim dividends */}
           <motion.div {...fadeUp} transition={{ delay: 0.2 }}>
-            <Card className="border-[#c8ff00]/20">
+            <Card className="border-primary/20">
               <CardHeader className="px-4 pt-4 pb-2">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <Gift className="size-4 text-[#c8ff00]" />
+                  <Gift className="size-4 text-primary" />
                   Claim Dividends
                 </CardTitle>
               </CardHeader>
               <CardContent className="px-4 pb-4 pt-0 space-y-3">
-                <div className="rounded-lg bg-[#c8ff00]/5 p-4 text-center">
+                <div className="rounded-lg bg-primary/5 p-4 text-center">
                   <p className="text-xs text-muted-foreground mb-1">
                     Pending Dividends
                   </p>
-                  <p className="text-2xl font-semibold text-[#c8ff00] font-mono tracking-tight">
+                  <p className="text-2xl font-semibold text-primary font-mono tracking-tight">
                     {pendingDividends}
                   </p>
                 </div>
-                <Button className="w-full bg-[#c8ff00] text-[#0a0a0a] hover:bg-[#c8ff00]/80 font-medium">
+                <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/80 font-medium">
                   <Gift className="size-4 mr-1.5" />
                   Claim {pendingDividends}
                 </Button>
@@ -434,7 +435,7 @@ export default function PortfolioPage() {
                   <span className="text-muted-foreground">
                     Total Earned (All Time)
                   </span>
-                  <span className="font-medium font-mono text-[#c8ff00]">
+                  <span className="font-medium font-mono text-primary">
                     $71.38
                   </span>
                 </div>
@@ -444,5 +445,107 @@ export default function PortfolioPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function GrandmaPortfolio() {
+  const totalValue = "$51,032.50";
+  const pendingDividends = "$8.22";
+
+  const simpleBalances = [
+    { label: "Income Tokens", symbol: "xdSPY", value: "$800.00", balance: "625.00" },
+    { label: "Price Tokens", symbol: "xpSPY", value: "$32,812.50", balance: "625.00" },
+    { label: "Investments", symbol: "xSPY", value: "$12,420.00", balance: "250.00" },
+    { label: "Cash Balance", symbol: "USDC", value: "$5,000.00", balance: "5,000.00" },
+  ];
+
+  return (
+    <div className="p-4 md:p-6 space-y-6 max-w-2xl mx-auto">
+      <motion.div {...fadeUp}>
+        <h1 className="font-[family-name:var(--font-safira)] text-2xl md:text-3xl tracking-tight">
+          Your Holdings
+        </h1>
+        <p className="text-muted-foreground text-sm mt-1">
+          Everything you own in one place.
+        </p>
+      </motion.div>
+
+      {/* Big total value */}
+      <motion.div {...fadeUp} transition={{ delay: 0.05 }}>
+        <Card className="border-primary/20">
+          <CardContent className="p-6 text-center">
+            <p className="text-sm text-muted-foreground mb-2">Total Value</p>
+            <p className="text-4xl font-semibold tracking-tight">{totalValue}</p>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Simple balance list */}
+      <motion.div {...fadeUp} transition={{ delay: 0.1 }}>
+        <Card>
+          <CardContent className="p-0">
+            {simpleBalances.map((item, i) => (
+              <div key={item.symbol}>
+                {i > 0 && <Separator className="opacity-30" />}
+                <div className="flex items-center justify-between px-5 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="size-9 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Coins className="size-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{item.label}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {item.balance} {item.symbol}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-sm font-semibold font-mono">{item.value}</p>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Earnings claim */}
+      <motion.div {...fadeUp} transition={{ delay: 0.15 }}>
+        <Card className="border-primary/20">
+          <CardContent className="p-6 text-center space-y-3">
+            <Gift className="size-8 text-primary mx-auto" />
+            <div>
+              <p className="text-sm text-muted-foreground">Earnings Ready to Collect</p>
+              <p className="text-3xl font-semibold text-primary font-mono tracking-tight mt-1">
+                {pendingDividends}
+              </p>
+            </div>
+            <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/80 font-medium">
+              <Gift className="size-4 mr-2" />
+              Collect Earnings
+            </Button>
+            <p className="text-xs text-muted-foreground">
+              Next payment expected: Apr 15, 2026
+            </p>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
+  );
+}
+
+export default function PortfolioPage() {
+  const { mode } = useAppMode();
+
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={mode}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        {mode === "expert" ? <ExpertPortfolio /> : <GrandmaPortfolio />}
+      </motion.div>
+    </AnimatePresence>
   );
 }

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Tabs,
   TabsList,
@@ -22,15 +23,17 @@ import {
   MoreHorizontal,
   X,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import CandlestickChart from "@/components/candlestick-chart";
 import { type Asset } from "@/lib/market-data";
 import { usePythPrices } from "@/lib/use-pyth-prices";
 import { usePythCandles } from "@/lib/use-pyth-candles";
+import { useAppMode } from "@/lib/mode-context";
 
 // ---- Helpers ----
 
-function LogoIcon({ asset, size = "sm" }: { asset: Asset; size?: "sm" | "md" }) {
-  const dim = size === "sm" ? "size-8" : "size-10";
+function LogoIcon({ asset, size = "sm" }: { asset: Asset; size?: "sm" | "md" | "lg" }) {
+  const dim = size === "lg" ? "size-14" : size === "md" ? "size-10" : "size-8";
   if (asset.logo) {
     return (
       <img
@@ -82,7 +85,6 @@ function OrderForm({
       onStopLossChange(null);
     } else {
       setStopLossEnabled(true);
-      // Default stop loss at 5% below current price for long, 5% above for short
       const defaultSL =
         tab === "long" ? asset.price * 0.95 : asset.price * 1.05;
       onStopLossChange(Math.round(defaultSL * 100) / 100);
@@ -91,13 +93,13 @@ function OrderForm({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Long / Short / Swap tabs */}
+      {/* Long / Short tabs */}
       <div className="flex items-center border-b border-border/50">
         <button
           onClick={() => setTab("long")}
           className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-sm font-medium transition-colors ${
             tab === "long"
-              ? "text-[#c8ff00] border-b-2 border-[#c8ff00]"
+              ? "text-primary border-b-2 border-primary"
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
@@ -228,7 +230,7 @@ function OrderForm({
             step={0.1}
             value={leverage}
             onChange={(e) => setLeverage(parseFloat(e.target.value))}
-            className="w-full h-1.5 rounded-full appearance-none bg-muted cursor-pointer accent-[#c8ff00]"
+            className="w-full h-1.5 rounded-full appearance-none bg-muted cursor-pointer accent-primary"
           />
 
           <div className="flex gap-1.5">
@@ -238,7 +240,7 @@ function OrderForm({
                 onClick={() => setLeverage(p)}
                 className={`flex-1 py-1 rounded text-[10px] font-medium transition-colors ${
                   leverage === p
-                    ? "bg-[#c8ff00]/15 text-[#c8ff00] border border-[#c8ff00]/30"
+                    ? "bg-primary/15 text-primary border border-primary/30"
                     : "bg-muted/30 text-muted-foreground hover:text-foreground"
                 }`}
               >
@@ -337,7 +339,7 @@ function OrderForm({
         <Button
           className={`w-full h-11 font-medium text-sm ${
             tab === "long"
-              ? "bg-[#c8ff00] text-[#0a0a0a] hover:bg-[#c8ff00]/80"
+              ? "bg-primary text-primary-foreground hover:bg-primary/80"
               : "bg-red-500 text-white hover:bg-red-600"
           }`}
           disabled={payNum <= 0}
@@ -350,38 +352,17 @@ function OrderForm({
   );
 }
 
-// ---- Main Page ----
+// ---- Expert Detail ----
 
-export default function MarketDetailPage({
-  params,
-}: {
-  params: Promise<{ ticker: string }>;
-}) {
-  const { ticker } = use(params);
-  const router = useRouter();
-  const liveAssets = usePythPrices();
-  const asset = liveAssets.find((a) => a.ticker === ticker);
+function ExpertDetail({ asset }: { asset: Asset }) {
   const [stopLoss, setStopLoss] = useState<number | null>(null);
   const [timeframe, setTimeframe] = useState("5m");
 
   const { candles, loading: candlesLoading } = usePythCandles(
-    asset?.symbol || "",
-    asset?.pythFeedId || "",
+    asset.symbol,
+    asset.pythFeedId,
     timeframe
   );
-
-  if (!asset) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center space-y-3">
-          <p className="text-muted-foreground">Asset not found</p>
-          <Button variant="outline" onClick={() => router.push("/app/markets")}>
-            Back to Markets
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   const positive = asset.change >= 0;
   const timeframes = ["1m", "5m", "15m", "1h", "4h", "D", "W", "M"];
@@ -389,7 +370,7 @@ export default function MarketDetailPage({
   return (
     <div className="flex flex-col h-full">
       {/* Top bar with asset info */}
-      <div className="flex items-center gap-3 px-4 py-2.5 border-b border-border/50 bg-[#0e0e0e]/60">
+      <div className="flex items-center gap-3 px-4 py-2.5 border-b border-border/50 bg-sidebar/60">
         <Link
           href="/app/markets"
           className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/30"
@@ -410,7 +391,7 @@ export default function MarketDetailPage({
         </span>
         <span
           className={`text-sm font-medium ${
-            positive ? "text-[#c8ff00]" : "text-red-500"
+            positive ? "text-primary" : "text-red-500"
           }`}
         >
           {positive ? "+" : ""}
@@ -424,7 +405,7 @@ export default function MarketDetailPage({
           </div>
           <div>
             <span className="mr-1">Change</span>
-            <span className={positive ? "text-[#c8ff00]" : "text-red-500"}>
+            <span className={positive ? "text-primary" : "text-red-500"}>
               ${Math.abs(asset.change).toFixed(2)}
             </span>
           </div>
@@ -532,7 +513,7 @@ export default function MarketDetailPage({
         </div>
 
         {/* Right: Order form */}
-        <div className="hidden md:flex w-[320px] border-l border-border/50 flex-col bg-[#0a0a0a]">
+        <div className="hidden md:flex w-[320px] border-l border-border/50 flex-col bg-background">
           <OrderForm
             asset={asset}
             stopLoss={stopLoss}
@@ -541,5 +522,116 @@ export default function MarketDetailPage({
         </div>
       </div>
     </div>
+  );
+}
+
+// ---- Grandma Detail ----
+
+function GrandmaDetail({ asset }: { asset: Asset }) {
+  const positive = asset.change >= 0;
+
+  return (
+    <div className="p-4 md:p-6 space-y-6 max-w-2xl mx-auto">
+      <Link
+        href="/app/markets"
+        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+      >
+        <ArrowLeft className="size-4" />
+        Back to Investments
+      </Link>
+
+      <Card>
+        <CardContent className="p-6 text-center space-y-4">
+          <LogoIcon asset={asset} size="lg" />
+          <div>
+            <h1 className="font-[family-name:var(--font-safira)] text-2xl tracking-tight">
+              {asset.name}
+            </h1>
+            <p className="text-xs text-muted-foreground mt-1">{asset.ticker}</p>
+          </div>
+
+          <div>
+            <p className="text-4xl font-semibold tracking-tight">
+              ${asset.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            </p>
+            <div className="flex items-center justify-center gap-1 mt-1">
+              {positive ? (
+                <TrendingUp className="size-4 text-green-500" />
+              ) : (
+                <TrendingDown className="size-4 text-red-500" />
+              )}
+              <span className={`text-sm font-medium ${positive ? "text-green-500" : "text-red-500"}`}>
+                {positive ? "+" : ""}{asset.changePercent.toFixed(2)}% today
+              </span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-5">
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            This is a tokenized version of <strong className="text-foreground">{asset.name}</strong>.
+            Deposit it in the Savings Vault to split it into income and price
+            tokens and start earning regular payments.
+          </p>
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <Link href="/app/vault" className="block">
+          <Button className="w-full h-12 bg-primary text-primary-foreground hover:bg-primary/80 font-medium text-sm">
+            Go to Savings Vault
+          </Button>
+        </Link>
+        <Link href="/app/markets" className="block">
+          <Button variant="outline" className="w-full h-12 font-medium text-sm">
+            Back to Investments
+          </Button>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+// ---- Main Page ----
+
+export default function MarketDetailPage({
+  params,
+}: {
+  params: Promise<{ ticker: string }>;
+}) {
+  const { ticker } = use(params);
+  const router = useRouter();
+  const liveAssets = usePythPrices();
+  const asset = liveAssets.find((a) => a.ticker === ticker);
+  const { mode } = useAppMode();
+
+  if (!asset) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center space-y-3">
+          <p className="text-muted-foreground">Asset not found</p>
+          <Button variant="outline" onClick={() => router.push("/app/markets")}>
+            Back to Markets
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={mode}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className={mode === "expert" ? "h-full" : ""}
+      >
+        {mode === "expert" ? <ExpertDetail asset={asset} /> : <GrandmaDetail asset={asset} />}
+      </motion.div>
+    </AnimatePresence>
   );
 }

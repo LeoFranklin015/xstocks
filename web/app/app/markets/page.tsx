@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +13,6 @@ import {
   LayoutGrid,
   List,
   ChevronDown,
-  Star,
   Circle,
 } from "lucide-react";
 import {
@@ -24,6 +23,7 @@ import {
 import { type Asset } from "@/lib/market-data";
 import { usePythPrices } from "@/lib/use-pyth-prices";
 import { usePythSparklines } from "@/lib/use-pyth-sparklines";
+import { useAppMode } from "@/lib/mode-context";
 
 function useInView() {
   const ref = useRef<HTMLDivElement>(null);
@@ -179,7 +179,6 @@ function AllAssetsList({ assets }: { assets: Asset[] }) {
       </div>
       <div className="space-y-3">
         {loaded.slice(0, 3).map((a) => {
-          const positive = a.change >= 0;
           return (
             <Link key={a.ticker} href={`/app/markets/${a.ticker}`}>
               <div className="flex items-center justify-between group cursor-pointer hover:bg-muted/20 rounded-lg px-2 py-1.5 -mx-2 transition-colors">
@@ -346,9 +345,72 @@ function AssetRow({ asset, sparkline }: { asset: Asset; sparkline?: { v: number 
   );
 }
 
-// ---- Main Page ----
+// ---- Grandma Markets ----
 
-export default function MarketsPage() {
+function GrandmaMarkets() {
+  const assets = usePythPrices();
+  const loaded = assets.filter((a) => a.price > 0);
+
+  return (
+    <div className="p-4 md:p-6 space-y-6 max-w-2xl mx-auto">
+      <motion.div {...fadeUp}>
+        <h1 className="font-[family-name:var(--font-safira)] text-2xl md:text-3xl tracking-tight">
+          Available Investments
+        </h1>
+        <p className="text-muted-foreground text-sm mt-1">
+          Browse assets you can invest in.
+        </p>
+      </motion.div>
+
+      <div className="space-y-2">
+        {loaded.length === 0 ? (
+          <div className="text-center py-16 text-muted-foreground text-sm">
+            Loading investments...
+          </div>
+        ) : (
+          loaded.map((asset, i) => {
+            const positive = asset.change >= 0;
+            return (
+              <motion.div
+                key={asset.ticker}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.03 }}
+              >
+                <Link href={`/app/markets/${asset.ticker}`}>
+                  <Card className="hover:border-[#c8ff00]/20 transition-colors cursor-pointer">
+                    <div className="flex items-center gap-4 p-4">
+                      <LogoIcon asset={asset} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium">{asset.name}</p>
+                        <p className="text-xs text-muted-foreground">{asset.ticker}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-semibold">${asset.price.toFixed(2)}</p>
+                        <p className={`text-xs font-medium ${positive ? "text-green-500" : "text-red-500"}`}>
+                          {positive ? (
+                            <TrendingUp className="size-3 inline mr-0.5" />
+                          ) : (
+                            <TrendingDown className="size-3 inline mr-0.5" />
+                          )}
+                          {positive ? "+" : ""}{asset.changePercent.toFixed(2)}%
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              </motion.div>
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ---- Expert Markets (original) ----
+
+function ExpertMarkets() {
   const assets = usePythPrices();
   const sparklines = usePythSparklines();
   const [search, setSearch] = useState("");
@@ -551,5 +613,25 @@ export default function MarketsPage() {
         )}
       </motion.div>
     </div>
+  );
+}
+
+// ---- Main Page ----
+
+export default function MarketsPage() {
+  const { mode } = useAppMode();
+
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={mode}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        {mode === "expert" ? <ExpertMarkets /> : <GrandmaMarkets />}
+      </motion.div>
+    </AnimatePresence>
   );
 }
