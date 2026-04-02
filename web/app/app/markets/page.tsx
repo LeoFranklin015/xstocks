@@ -110,7 +110,7 @@ function TopGainers({ assets }: { assets: Asset[] }) {
                 <p className="text-sm font-medium text-foreground">
                   ${a.price.toFixed(2)}
                 </p>
-                <p className="text-xs font-mono text-[#c8ff00]">
+                <p className="text-xs font-mono text-primary">
                   <TrendingUp className="size-3 inline mr-0.5" />
                   +{a.changePercent.toFixed(2)}%
                 </p>
@@ -156,7 +156,7 @@ function TrendingAssets({ assets }: { assets: Asset[] }) {
                   <p className="text-sm font-medium text-foreground">
                     ${a.price.toFixed(2)}
                   </p>
-                  <p className={`text-xs font-mono ${positive ? "text-[#c8ff00]" : "text-red-500"}`}>
+                  <p className={`text-xs font-mono ${positive ? "text-primary" : "text-red-500"}`}>
                     {positive ? "+" : ""}{a.changePercent.toFixed(2)}%
                   </p>
                 </div>
@@ -213,8 +213,8 @@ function AssetCard({ asset, sparkline, apy }: { asset: Asset; sparkline?: { v: n
   const positive = asset.change >= 0;
   const loading = asset.price === 0;
   const { ref, seen } = useInView();
-  const strokeColor = positive ? "#c8ff00" : "#ff4444";
-  const bgColor = positive ? "rgba(200, 255, 0, 0.06)" : "rgba(255, 68, 68, 0.06)";
+  const strokeColor = positive ? "#4d7a00" : "#ff4444";
+  const bgColor = positive ? "rgba(77, 122, 0, 0.06)" : "rgba(255, 68, 68, 0.06)";
   const gradientId = `grad-${asset.ticker}`;
 
   return (
@@ -244,7 +244,7 @@ function AssetCard({ asset, sparkline, apy }: { asset: Asset; sparkline?: { v: n
                 <p className="text-2xl font-semibold text-foreground tracking-tight">
                   ${asset.price.toFixed(2)}
                 </p>
-                <p className={`text-xs font-mono mt-0.5 tracking-wide ${positive ? "text-[#c8ff00]" : "text-red-500"}`}>
+                <p className={`text-xs font-mono mt-0.5 tracking-wide ${positive ? "text-primary" : "text-red-500"}`}>
                   {positive ? (
                     <TrendingUp className="size-3 inline mr-0.5" />
                   ) : (
@@ -323,7 +323,7 @@ function AssetRow({ asset, sparkline, apy }: { asset: Asset; sparkline?: { v: nu
                   <Area
                     type="monotone"
                     dataKey="v"
-                    stroke={positive ? "#c8ff00" : "#ff4444"}
+                    stroke={positive ? "#4d7a00" : "#ff4444"}
                     strokeWidth={1.5}
                     fill="transparent"
                     dot={false}
@@ -344,7 +344,7 @@ function AssetRow({ asset, sparkline, apy }: { asset: Asset; sparkline?: { v: nu
                 <p className="text-sm font-medium text-foreground">
                   ${asset.price.toFixed(2)}
                 </p>
-                <p className={`text-xs font-mono ${positive ? "text-[#c8ff00]" : "text-red-500"}`}>
+                <p className={`text-xs font-mono ${positive ? "text-primary" : "text-red-500"}`}>
                   {positive ? "+" : ""}{asset.changePercent.toFixed(2)}%
                 </p>
               </>
@@ -366,10 +366,10 @@ function GrandmaMarkets() {
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-2xl mx-auto">
       <motion.div {...fadeUp}>
-        <h1 className="font-[family-name:var(--font-safira)] text-2xl md:text-3xl tracking-tight">
+        <h1 className="font-[family-name:var(--font-safira)] text-4xl md:text-5xl tracking-tight">
           Available Investments
         </h1>
-        <p className="text-muted-foreground text-sm mt-1">
+        <p className="text-muted-foreground text-base mt-2">
           Browse assets you can invest in.
         </p>
       </motion.div>
@@ -391,7 +391,7 @@ function GrandmaMarkets() {
                 transition={{ delay: i * 0.03 }}
               >
                 <Link href={`/app/markets/${asset.ticker}`}>
-                  <Card className="hover:border-[#c8ff00]/20 transition-colors cursor-pointer">
+                  <Card className="hover:border-primary/20 transition-colors cursor-pointer">
                     <div className="flex items-center gap-4 p-4">
                       <LogoIcon asset={asset} />
                       <div className="flex-1 min-w-0">
@@ -492,7 +492,7 @@ function ExpertMarkets() {
       <motion.div {...fadeUp} transition={{ delay: 0.05 }}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
           <div className="flex items-center gap-2">
-            <h2 className="font-[family-name:var(--font-safira)] text-xl md:text-2xl tracking-tight text-foreground">
+            <h2 className="font-[family-name:var(--font-safira)] text-2xl md:text-3xl tracking-tight text-foreground">
               Explore xStocks
             </h2>
             <span className="text-xs text-muted-foreground align-super">
@@ -500,9 +500,9 @@ function ExpertMarkets() {
             </span>
           </div>
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Circle className="size-2 fill-[#c8ff00] text-[#c8ff00]" />
+            <Circle className="size-2 fill-primary text-primary" />
             <span>Pyth Network</span>
-            <span className="text-[#c8ff00] font-medium">(Live)</span>
+            <span className="text-primary font-medium">(Live)</span>
           </div>
         </div>
 
@@ -585,7 +585,7 @@ function ExpertMarkets() {
                           }}
                           className={`w-full text-left px-3 py-1.5 text-xs transition-colors ${
                             sortBy === opt
-                              ? "text-[#c8ff00] bg-muted/30"
+                              ? "text-primary bg-muted/30"
                               : "text-foreground hover:bg-muted/30"
                           }`}
                         >

@@ -32,14 +32,18 @@ export const DIVIDEND_APY: Record<string, number> = {
   SPY: 0.0143,   // ~1.43% -- S&P 500 aggregate dividends
 };
 
-// Derive xd token list from existing xStock assets
-export const xdTokens = xStockAssets.map((a) => ({
-  ticker: `xd${a.symbol}`,
-  name: `${a.name.replace(" xStock", "")} Income`,
-  symbol: a.symbol,
-  logo: a.logo,
-  color: a.color,
-}));
+// Derive xd token list from existing xStock assets (lazy to avoid init-order issues)
+export function getXdTokens() {
+  return xStockAssets.map((a) => ({
+    ticker: `xd${a.symbol}`,
+    name: `${a.name.replace(" xStock", "")} Income`,
+    symbol: a.symbol,
+    logo: a.logo,
+    color: a.color,
+  }));
+}
+
+export const xdTokens = getXdTokens();
 
 function addr(): string {
   const hex = "0123456789abcdef";
@@ -80,7 +84,9 @@ function listing(
   daysLeft: number,
   sellerIdx: number
 ): AuctionListing {
-  const tok = xdTokens[tokenIdx];
+  const tokens = getXdTokens();
+  const tok = tokens[tokenIdx];
+  if (!tok) throw new Error(`xdToken at index ${tokenIdx} not found (${tokens.length} available)`);
   const bids = makeBids(bidCount, startingPrice);
   return {
     id,

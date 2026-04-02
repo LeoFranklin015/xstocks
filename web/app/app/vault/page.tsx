@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Card,
@@ -9,389 +9,565 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-  TabsContent,
-} from "@/components/ui/tabs";
-import {
   ArrowDownToLine,
   ArrowUpFromLine,
-  Coins,
+  ChevronDown,
   Gift,
   Lock,
-  CalendarClock,
-  Info,
+  DollarSign,
+  TrendingUp,
+  Coins,
+  ArrowDown,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useAppMode } from "@/lib/mode-context";
-
-const vaultStats = {
-  tvl: "$2,420,000",
-  totalXdSpy: "18,450 xdSPY",
-  totalXpSpy: "18,450 xpSPY",
-  rewardPerShare: "0.0234 USDC",
-};
+import { xStockAssets, type Asset } from "@/lib/market-data";
 
 const fadeUp = {
   initial: { opacity: 0, y: 12 },
   animate: { opacity: 1, y: 0 },
 };
 
-function DepositTab() {
-  const [amount, setAmount] = useState("");
-  const numAmount = parseFloat(amount) || 0;
+type VaultMode = "deposit" | "withdraw";
 
-  return (
-    <div className="space-y-4">
-      <div>
-        <label className="text-xs text-muted-foreground font-medium mb-1.5 block">
-          xSPY Amount
-        </label>
-        <div className="relative">
-          <Input
-            type="number"
-            placeholder="0.00"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            className="pr-16 h-12 text-lg"
-          />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-medium">
-            xSPY
-          </span>
-        </div>
-        <p className="text-xs text-muted-foreground mt-1.5">
-          Balance: 1,250.00 xSPY
-        </p>
-      </div>
-
-      <div className="rounded-lg bg-muted/50 p-4 space-y-2">
-        <p className="text-xs text-muted-foreground font-medium mb-2">
-          You will receive:
-        </p>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="size-6 rounded-full bg-primary/20 flex items-center justify-center">
-              <Coins className="size-3 text-primary" />
-            </div>
-            <span className="text-sm">xdSPY (Income)</span>
-          </div>
-          <span className="text-sm font-medium font-mono">
-            {numAmount.toFixed(2)}
-          </span>
-        </div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="size-6 rounded-full bg-primary/20 flex items-center justify-center">
-              <Coins className="size-3 text-primary" />
-            </div>
-            <span className="text-sm">xpSPY (Price)</span>
-          </div>
-          <span className="text-sm font-medium font-mono">
-            {numAmount.toFixed(2)}
-          </span>
-        </div>
-      </div>
-
-      <div className="flex items-start gap-2 text-xs text-muted-foreground bg-muted/30 rounded-lg p-3">
-        <Info className="size-3.5 mt-0.5 shrink-0" />
-        <p>
-          Depositing xSPY splits it 1:1 into xdSPY (income token) and xpSPY
-          (price exposure token). You can trade them independently or recombine
-          later.
-        </p>
-      </div>
-
-      <Button
-        className="w-full h-10 bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
-        disabled={numAmount <= 0}
-      >
-        <ArrowDownToLine className="size-4 mr-2" />
-        Deposit xSPY
-      </Button>
-    </div>
-  );
-}
-
-function WithdrawTab() {
-  const [xdAmount, setXdAmount] = useState("");
-  const [xpAmount, setXpAmount] = useState("");
-
-  return (
-    <div className="space-y-4">
-      <div className="rounded-lg bg-muted/50 p-4 space-y-2">
-        <p className="text-xs text-muted-foreground font-medium mb-2">
-          Your Balances
-        </p>
-        <div className="flex items-center justify-between">
-          <span className="text-sm">xdSPY</span>
-          <span className="text-sm font-medium font-mono">625.00</span>
-        </div>
-        <div className="flex items-center justify-between">
-          <span className="text-sm">xpSPY</span>
-          <span className="text-sm font-medium font-mono">625.00</span>
-        </div>
-      </div>
-
-      <div>
-        <label className="text-xs text-muted-foreground font-medium mb-1.5 block">
-          xdSPY Amount
-        </label>
-        <Input
-          type="number"
-          placeholder="0.00"
-          value={xdAmount}
-          onChange={(e) => {
-            setXdAmount(e.target.value);
-            setXpAmount(e.target.value);
-          }}
-          className="h-10"
-        />
-      </div>
-
-      <div>
-        <label className="text-xs text-muted-foreground font-medium mb-1.5 block">
-          xpSPY Amount
-        </label>
-        <Input
-          type="number"
-          placeholder="0.00"
-          value={xpAmount}
-          onChange={(e) => {
-            setXpAmount(e.target.value);
-            setXdAmount(e.target.value);
-          }}
-          className="h-10"
-        />
-      </div>
-
-      <div className="flex items-start gap-2 text-xs text-muted-foreground bg-muted/30 rounded-lg p-3">
-        <Info className="size-3.5 mt-0.5 shrink-0" />
-        <p>
-          You must provide equal amounts of xdSPY and xpSPY to recombine back
-          into xSPY.
-        </p>
-      </div>
-
-      <Button
-        className="w-full h-10 bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
-        disabled={!xdAmount || parseFloat(xdAmount) <= 0}
-      >
-        <ArrowUpFromLine className="size-4 mr-2" />
-        Recombine to xSPY
-      </Button>
-    </div>
-  );
-}
-
-const howItWorksSteps = [
+// Stats matching dashboard card pattern
+const vaultStats = [
   {
-    step: "1",
-    title: "Deposit xSPY",
-    desc: "Send your tokenized ETF into the vault. xSPY represents a real stock/ETF on-chain.",
+    label: "Vault Balance",
+    value: "$2,420,000",
+    icon: Lock,
+    change: "+5.2%",
+    positive: true,
   },
   {
-    step: "2",
-    title: "Receive dx + px",
-    desc: "The vault mints equal amounts of xdSPY (income) and xpSPY (price exposure) 1:1.",
+    label: "Claimable Rewards",
+    value: "$8.22",
+    icon: Gift,
+    change: "Claim",
+    positive: true,
+    isBadge: true,
   },
   {
-    step: "3",
-    title: "Earn & Trade",
-    desc: "xdSPY accrues dividends and borrow fees. xpSPY gives leveraged price exposure during NYSE hours.",
+    label: "Total Earnings",
+    value: "$14.63",
+    icon: TrendingUp,
+    change: "+12.4%",
+    positive: true,
   },
   {
-    step: "4",
-    title: "Recombine Anytime",
-    desc: "Return equal amounts of xdSPY + xpSPY to withdraw your original xSPY back.",
+    label: "Reward / Share",
+    value: "0.0234",
+    icon: DollarSign,
+    change: "USDC",
+    positive: true,
+    isBadge: true,
   },
 ];
 
-function HowItWorks() {
+// ---- Token Pill (Uniswap-style) ----
+function TokenPill({
+  asset,
+  label,
+  onClick,
+  color,
+}: {
+  asset?: Asset;
+  label: string;
+  onClick?: () => void;
+  color?: string;
+}) {
   return (
-    <motion.div {...fadeUp} transition={{ delay: 0.02 }}>
-      <Card>
-        <CardHeader className="px-4 pt-4 pb-2">
-          <CardTitle className="text-sm font-medium">How the Vault Works</CardTitle>
-        </CardHeader>
-        <CardContent className="px-4 pb-4 pt-0">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {howItWorksSteps.map((s, i) => (
-              <div key={s.step} className="relative flex flex-col gap-2">
-                {/* connector line */}
-                {i < howItWorksSteps.length - 1 && (
-                  <div className="hidden lg:block absolute top-4 left-[calc(100%_-_8px)] w-4 h-px bg-border/60 z-0" />
-                )}
-                <div className="flex items-center gap-2">
-                  <div className="size-7 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0 z-10">
-                    <span className="text-[11px] font-semibold text-primary">{s.step}</span>
-                  </div>
-                  <p className="text-sm font-medium">{s.title}</p>
-                </div>
-                <p className="text-xs text-muted-foreground leading-relaxed pl-9">{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex items-center gap-2.5 rounded-full border border-border/60 bg-muted/40 px-4 py-2.5 hover:bg-muted/60 transition-colors shrink-0"
+    >
+      {asset?.logo ? (
+        <img
+          src={asset.logo}
+          alt={asset.symbol}
+          className="size-7 rounded-full object-cover"
+        />
+      ) : (
+        <div
+          className="size-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
+          style={{ backgroundColor: color || asset?.color || "#888" }}
+        >
+          {label.slice(0, 2)}
+        </div>
+      )}
+      <span className="text-base font-semibold text-foreground">{label}</span>
+      {onClick && <ChevronDown className="size-4 text-muted-foreground" />}
+    </button>
   );
 }
 
-function ExpertVault() {
+// ---- Asset Selector Dropdown ----
+function AssetSelector({
+  selected,
+  onSelect,
+}: {
+  selected: Asset;
+  onSelect: (a: Asset) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
   return (
-    <div className="p-4 md:p-6 space-y-6 max-w-5xl mx-auto">
+    <div ref={ref} className="relative inline-block">
+      <TokenPill
+        asset={selected}
+        label={`x${selected.symbol}`}
+        onClick={() => setOpen(!open)}
+      />
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.15 }}
+            className="absolute top-full right-0 mt-2 z-50 w-64 rounded-xl border border-border/50 bg-card shadow-xl py-1.5 overflow-hidden"
+          >
+            {xStockAssets.map((asset) => {
+              const isSelected = selected.symbol === asset.symbol;
+              return (
+                <button
+                  key={asset.ticker}
+                  type="button"
+                  onClick={() => {
+                    onSelect(asset);
+                    setOpen(false);
+                  }}
+                  className={cn(
+                    "flex items-center gap-3 w-full px-4 py-3 text-left transition-colors",
+                    isSelected
+                      ? "bg-primary/5 text-primary"
+                      : "hover:bg-muted/30 text-foreground"
+                  )}
+                >
+                  {asset.logo ? (
+                    <img
+                      src={asset.logo}
+                      alt={asset.symbol}
+                      className="size-8 rounded-full object-cover shrink-0"
+                    />
+                  ) : (
+                    <div
+                      className="size-8 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0"
+                      style={{ backgroundColor: asset.color }}
+                    >
+                      {asset.symbol.slice(0, 2)}
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className={cn(
+                        "text-sm font-semibold",
+                        isSelected ? "text-primary" : "text-foreground"
+                      )}
+                    >
+                      x{asset.symbol}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {asset.name}
+                    </p>
+                  </div>
+                  {isSelected && (
+                    <div className="size-2 rounded-full bg-primary shrink-0" />
+                  )}
+                </button>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ---- Mode Tabs (Uniswap-style inline) ----
+function VaultModeTabs({
+  value,
+  onChange,
+}: {
+  value: VaultMode;
+  onChange: (v: VaultMode) => void;
+}) {
+  return (
+    <div className="flex items-center gap-1">
+      {(["deposit", "withdraw"] as VaultMode[]).map((id) => (
+        <button
+          key={id}
+          type="button"
+          onClick={() => onChange(id)}
+          className={cn(
+            "px-4 py-2 rounded-full text-base font-semibold transition-all duration-200",
+            value === id
+              ? "bg-muted/60 text-foreground"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          {id === "deposit" ? "Deposit" : "Withdraw"}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ---- Deposit Tab ----
+function DepositTab({ asset }: { asset: Asset }) {
+  const [amount, setAmount] = useState("");
+  const numAmount = parseFloat(amount) || 0;
+  const clean = (v: string) => v.replace(/[^0-9.]/g, "");
+
+  const xSymbol = `x${asset.symbol}`;
+  const xdSymbol = `xd${asset.symbol}`;
+  const xpSymbol = `xp${asset.symbol}`;
+
+  return (
+    <div className="space-y-1">
+      {/* Input: You Deposit */}
+      <div className="rounded-2xl bg-muted/30 border border-border/40 p-5">
+        <p className="text-sm text-muted-foreground font-medium mb-3">
+          You Deposit
+        </p>
+        <div className="flex items-center justify-between gap-4">
+          <input
+            type="text"
+            inputMode="decimal"
+            placeholder="0"
+            value={amount}
+            onChange={(e) => setAmount(clean(e.target.value))}
+            className="min-w-0 flex-1 bg-transparent text-4xl md:text-5xl font-semibold tracking-tight text-foreground outline-none placeholder:text-muted-foreground/25 font-mono"
+          />
+          <AssetSelector selected={asset} onSelect={() => {}} />
+        </div>
+        <p className="text-sm text-muted-foreground mt-3">
+          Balance: 1,250.00 {xSymbol}
+        </p>
+      </div>
+
+      {/* Arrow */}
+      <div className="flex justify-center -my-4 relative z-10">
+        <div className="size-10 rounded-xl bg-card border border-border/50 shadow-sm flex items-center justify-center">
+          <ArrowDown className="size-5 text-muted-foreground" />
+        </div>
+      </div>
+
+      {/* Output: You Receive */}
+      <div className="rounded-2xl bg-muted/20 border border-border/40 p-5">
+        <p className="text-sm text-muted-foreground font-medium mb-3">
+          You Receive
+        </p>
+        <div className="grid grid-cols-2 gap-6">
+          <div>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="size-8 rounded-full bg-blue-500/10 flex items-center justify-center">
+                <Coins className="size-4 text-blue-500" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold">{xdSymbol}</p>
+                <p className="text-xs text-muted-foreground">Income Token</p>
+              </div>
+            </div>
+            <p className="text-3xl md:text-4xl font-semibold font-mono tracking-tight text-foreground">
+              {numAmount > 0 ? numAmount.toFixed(2) : "0"}
+            </p>
+          </div>
+          <div>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="size-8 rounded-full bg-violet-500/10 flex items-center justify-center">
+                <Coins className="size-4 text-violet-500" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold">{xpSymbol}</p>
+                <p className="text-xs text-muted-foreground">Price Token</p>
+              </div>
+            </div>
+            <p className="text-3xl md:text-4xl font-semibold font-mono tracking-tight text-foreground">
+              {numAmount > 0 ? numAmount.toFixed(2) : "0"}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Split ratio detail */}
+      <div className="flex items-center justify-center gap-2 py-2 text-xs text-muted-foreground">
+        <Coins className="size-3" />
+        <span>
+          1 {xSymbol} = 1 {xdSymbol} + 1 {xpSymbol}
+        </span>
+      </div>
+
+      {/* CTA */}
+      <Button
+        type="button"
+        disabled={numAmount <= 0}
+        className="w-full h-14 rounded-2xl bg-primary text-lg font-semibold text-primary-foreground hover:bg-primary/80 disabled:opacity-30 shadow-lg shadow-primary/10"
+      >
+        <ArrowDownToLine className="size-5 mr-2.5" />
+        Deposit {xSymbol}
+      </Button>
+    </div>
+  );
+}
+
+// ---- Withdraw Tab ----
+function WithdrawTab({ asset }: { asset: Asset }) {
+  const [returnAmount, setReturnAmount] = useState("");
+  const clean = (v: string) => v.replace(/[^0-9.]/g, "");
+  const numReturn = parseFloat(returnAmount) || 0;
+
+  const xSymbol = `x${asset.symbol}`;
+  const xdSymbol = `xd${asset.symbol}`;
+  const xpSymbol = `xp${asset.symbol}`;
+
+  return (
+    <div className="space-y-1">
+      {/* Input: You Return */}
+      <div className="rounded-2xl bg-muted/30 border border-border/40 p-5">
+        <p className="text-sm text-muted-foreground font-medium mb-3">
+          You Return (Equal Amounts)
+        </p>
+
+        {/* xd input */}
+        <div className="flex items-center justify-between gap-4 mb-4">
+          <input
+            type="text"
+            inputMode="decimal"
+            placeholder="0"
+            value={returnAmount}
+            onChange={(e) => setReturnAmount(clean(e.target.value))}
+            className="min-w-0 flex-1 bg-transparent text-4xl md:text-5xl font-semibold tracking-tight text-foreground outline-none placeholder:text-muted-foreground/25 font-mono"
+          />
+          <TokenPill label={xdSymbol} color="#3b82f6" />
+        </div>
+        <p className="text-sm text-muted-foreground mb-4">
+          Balance: 625.00 {xdSymbol}
+        </p>
+
+        <Separator className="opacity-30 my-4" />
+
+        {/* xp input (synced) */}
+        <div className="flex items-center justify-between gap-4 mb-4">
+          <p className="text-4xl md:text-5xl font-semibold tracking-tight text-foreground font-mono">
+            {numReturn > 0 ? returnAmount : "0"}
+          </p>
+          <TokenPill label={xpSymbol} color="#8b5cf6" />
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Balance: 625.00 {xpSymbol}
+        </p>
+      </div>
+
+      {/* Arrow */}
+      <div className="flex justify-center -my-4 relative z-10">
+        <div className="size-10 rounded-xl bg-card border border-border/50 shadow-sm flex items-center justify-center">
+          <ArrowDown className="size-5 text-muted-foreground" />
+        </div>
+      </div>
+
+      {/* Output: You Receive */}
+      <div className="rounded-2xl bg-muted/20 border border-border/40 p-5">
+        <p className="text-sm text-muted-foreground font-medium mb-3">
+          You Receive
+        </p>
+        <div className="flex items-center justify-between gap-4">
+          <p className="text-4xl md:text-5xl font-semibold font-mono tracking-tight text-foreground">
+            {numReturn > 0 ? numReturn.toFixed(2) : "0"}
+          </p>
+          <AssetSelector selected={asset} onSelect={() => {}} />
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div className="pt-2">
+        <Button
+          type="button"
+          disabled={numReturn <= 0}
+          variant="outline"
+          className="w-full h-14 rounded-2xl text-lg font-semibold disabled:opacity-30"
+        >
+          <ArrowUpFromLine className="size-5 mr-2.5" />
+          Withdraw {xSymbol}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// ---- How It Works ----
+const steps = [
+  {
+    n: "01",
+    title: "Deposit xStock",
+    desc: "Send your tokenized stock into the vault.",
+  },
+  {
+    n: "02",
+    title: "Receive dx + px",
+    desc: "Vault mints equal income and price tokens 1:1.",
+  },
+  {
+    n: "03",
+    title: "Earn & Trade",
+    desc: "xdToken accrues dividends. xpToken tracks price.",
+  },
+  {
+    n: "04",
+    title: "Recombine",
+    desc: "Return equal amounts to withdraw original xStock.",
+  },
+];
+
+// ====== Expert Vault ======
+function ExpertVault() {
+  const [vaultMode, setVaultMode] = useState<VaultMode>("deposit");
+  const [selectedAsset, setSelectedAsset] = useState<Asset>(xStockAssets[3]);
+
+  return (
+    <div className="p-4 md:p-6 space-y-8 max-w-7xl mx-auto">
+      {/* Header */}
       <motion.div {...fadeUp}>
         <h1 className="font-[family-name:var(--font-safira)] text-2xl md:text-3xl tracking-tight">
           Vault
         </h1>
         <p className="text-muted-foreground text-sm mt-1">
-          Deposit xSPY to mint income and price exposure tokens.
+          Split tokenized stocks into income and price exposure tokens.
         </p>
       </motion.div>
 
-      <HowItWorks />
+      {/* Stat cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {vaultStats.map((stat, i) => (
+          <motion.div
+            key={stat.label}
+            {...fadeUp}
+            transition={{ delay: 0.05 * (i + 1) }}
+          >
+            <Card className="hover:border-primary/20 transition-colors">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 pt-4">
+                <span className="text-xs text-muted-foreground font-medium">
+                  {stat.label}
+                </span>
+                <stat.icon className="size-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="px-4 pb-4 pt-0">
+                <div className="text-xl font-semibold tracking-tight">
+                  {stat.value}
+                </div>
+                <div className="flex items-center gap-1 mt-1">
+                  {stat.isBadge ? (
+                    <Badge className="bg-primary/10 text-primary border-0 text-[10px]">
+                      {stat.change}
+                    </Badge>
+                  ) : (
+                    <span
+                      className={`text-xs font-medium ${
+                        stat.positive ? "text-green-500" : "text-red-500"
+                      }`}
+                    >
+                      {stat.change}
+                    </span>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ))}
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main deposit/withdraw */}
+      {/* Centered swap card */}
+      <div className="flex justify-center">
         <motion.div
-          className="lg:col-span-2"
           {...fadeUp}
-          transition={{ delay: 0.05 }}
+          transition={{ delay: 0.25 }}
+          className="w-full max-w-xl"
         >
-          <Card>
-            <CardContent className="p-4">
-              <Tabs defaultValue="deposit">
-                <TabsList className="w-full mb-4">
-                  <TabsTrigger value="deposit" className="flex-1">
-                    <ArrowDownToLine className="size-3.5 mr-1.5" />
-                    Deposit
-                  </TabsTrigger>
-                  <TabsTrigger value="withdraw" className="flex-1">
-                    <ArrowUpFromLine className="size-3.5 mr-1.5" />
-                    Withdraw
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value="deposit">
-                  <DepositTab />
-                </TabsContent>
-                <TabsContent value="withdraw">
-                  <WithdrawTab />
-                </TabsContent>
-              </Tabs>
+          <Card className="overflow-visible">
+            <CardHeader className="px-6 pt-6 pb-4">
+              <VaultModeTabs value={vaultMode} onChange={setVaultMode} />
+            </CardHeader>
+            <CardContent className="px-6 pb-6 pt-0">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={vaultMode + selectedAsset.symbol}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.18 }}
+                >
+                  {vaultMode === "deposit" ? (
+                    <DepositTab asset={selectedAsset} />
+                  ) : (
+                    <WithdrawTab asset={selectedAsset} />
+                  )}
+                </motion.div>
+              </AnimatePresence>
             </CardContent>
           </Card>
         </motion.div>
-
-        {/* Sidebar stats */}
-        <div className="space-y-4">
-          <motion.div {...fadeUp} transition={{ delay: 0.1 }}>
-            <Card>
-              <CardHeader className="px-4 pt-4 pb-2">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <Lock className="size-4 text-muted-foreground" />
-                  Vault Stats
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="px-4 pb-4 pt-0 space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-muted-foreground">TVL</span>
-                  <span className="text-sm font-medium font-mono">
-                    {vaultStats.tvl}
-                  </span>
-                </div>
-                <Separator className="opacity-30" />
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-muted-foreground">
-                    Total xdSPY Minted
-                  </span>
-                  <span className="text-sm font-medium font-mono">
-                    {vaultStats.totalXdSpy}
-                  </span>
-                </div>
-                <Separator className="opacity-30" />
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-muted-foreground">
-                    Total xpSPY Minted
-                  </span>
-                  <span className="text-sm font-medium font-mono">
-                    {vaultStats.totalXpSpy}
-                  </span>
-                </div>
-                <Separator className="opacity-30" />
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-muted-foreground">
-                    Reward / Share
-                  </span>
-                  <span className="text-sm font-medium font-mono">
-                    {vaultStats.rewardPerShare}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div {...fadeUp} transition={{ delay: 0.15 }}>
-            <Card className="border-primary/20">
-              <CardHeader className="px-4 pt-4 pb-2">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <Gift className="size-4 text-primary" />
-                  Dividends
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="px-4 pb-4 pt-0 space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-muted-foreground flex items-center gap-1.5">
-                    <CalendarClock className="size-3" />
-                    Next Dividend
-                  </span>
-                  <span className="text-sm font-medium">Apr 15, 2026</span>
-                </div>
-                <Separator className="opacity-30" />
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-muted-foreground">
-                    Estimated Amount
-                  </span>
-                  <span className="text-sm font-medium font-mono text-primary">
-                    $14.63
-                  </span>
-                </div>
-                <Separator className="opacity-30" />
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-muted-foreground">
-                    Pending (Claimable)
-                  </span>
-                  <span className="text-sm font-medium font-mono text-primary">
-                    $8.22
-                  </span>
-                </div>
-                <Button
-                  className="w-full mt-1 bg-primary text-primary-foreground hover:bg-primary/80 font-medium"
-                  size="sm"
-                >
-                  <Gift className="size-3.5 mr-1.5" />
-                  Claim $8.22
-                </Button>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
       </div>
+
+      {/* How It Works - bottom, full width */}
+      <motion.div {...fadeUp} transition={{ delay: 0.35 }}>
+        <Card>
+          <CardHeader className="px-6 pt-5 pb-2">
+            <CardTitle className="text-sm font-medium">How It Works</CardTitle>
+          </CardHeader>
+          <CardContent className="px-6 pb-5 pt-0">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {steps.map((s) => (
+                <div key={s.n} className="flex items-start gap-3">
+                  <div className="flex size-9 items-center justify-center rounded-xl bg-primary/10 shrink-0">
+                    <span className="text-xs font-bold text-primary">
+                      {s.n}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold">{s.title}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                      {s.desc}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 }
 
+// ====== Grandma Vault ======
 function GrandmaVault() {
   const [depositAmount, setDepositAmount] = useState("");
   const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [selectedAsset, setSelectedAsset] = useState<Asset>(xStockAssets[3]);
+
   const depositNum = parseFloat(depositAmount) || 0;
   const withdrawNum = parseFloat(withdrawAmount) || 0;
+  const xSymbol = `x${selectedAsset.symbol}`;
 
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-2xl mx-auto">
+      {/* Header */}
       <motion.div {...fadeUp}>
         <h1 className="font-[family-name:var(--font-safira)] text-2xl md:text-3xl tracking-tight">
           Your Savings Vault
@@ -401,55 +577,82 @@ function GrandmaVault() {
         </p>
       </motion.div>
 
-      {/* Explanation */}
+      {/* Balance card */}
       <motion.div {...fadeUp} transition={{ delay: 0.05 }}>
-        <div className="grid grid-cols-2 gap-3">
-          {[
-            { icon: "1", title: "Put money in", desc: "Deposit your xSPY tokens" },
-            { icon: "2", title: "Vault splits it", desc: "You get Income + Price tokens" },
-            { icon: "3", title: "Earn payments", desc: "Income token pays out regularly" },
-            { icon: "4", title: "Take money out", desc: "Return both tokens to get xSPY back" },
-          ].map((s) => (
-            <Card key={s.icon} className="bg-background">
-              <CardContent className="p-4">
-                <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                  <span className="text-xs font-bold text-primary">{s.icon}</span>
-                </div>
-                <p className="text-sm font-medium">{s.title}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{s.desc}</p>
-              </CardContent>
-            </Card>
-          ))}
+        <Card className="border-primary/20">
+          <CardContent className="p-6 text-center">
+            <p className="text-sm text-muted-foreground mb-2">Vault Balance</p>
+            <p className="text-4xl font-semibold tracking-tight">$2,420,000</p>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Asset selector */}
+      <motion.div {...fadeUp} transition={{ delay: 0.08 }}>
+        <div className="flex items-center gap-3 rounded-xl border border-border/50 bg-muted/20 px-4 py-3">
+          {selectedAsset.logo ? (
+            <img
+              src={selectedAsset.logo}
+              alt={selectedAsset.symbol}
+              className="size-9 rounded-full object-cover"
+            />
+          ) : (
+            <div
+              className="size-9 rounded-full flex items-center justify-center text-xs font-bold text-white"
+              style={{ backgroundColor: selectedAsset.color }}
+            >
+              {selectedAsset.symbol.slice(0, 2)}
+            </div>
+          )}
+          <div className="flex-1">
+            <p className="text-base font-semibold">x{selectedAsset.symbol}</p>
+            <p className="text-xs text-muted-foreground">
+              {selectedAsset.name}
+            </p>
+          </div>
+          <Badge variant="secondary" className="text-xs">
+            {selectedAsset.type}
+          </Badge>
         </div>
       </motion.div>
 
-      {/* Put Money In */}
-      <motion.div {...fadeUp} transition={{ delay: 0.1 }}>
+      {/* Deposit */}
+      <motion.div {...fadeUp} transition={{ delay: 0.12 }}>
         <Card className="border-primary/20">
-          <CardHeader className="px-5 pt-5 pb-3">
-            <CardTitle className="text-base font-medium flex items-center gap-2">
-              <ArrowDownToLine className="size-5 text-primary" />
+          <CardHeader className="px-5 pt-5 pb-2">
+            <CardTitle className="text-base font-semibold flex items-center gap-3">
+              <div className="size-9 rounded-full bg-primary/10 flex items-center justify-center">
+                <ArrowDownToLine className="size-4 text-primary" />
+              </div>
               Put Money In
             </CardTitle>
           </CardHeader>
-          <CardContent className="px-5 pb-5 pt-0 space-y-3">
+          <CardContent className="px-5 pb-5 pt-2 space-y-4">
             <div>
-              <label className="text-sm text-muted-foreground mb-1.5 block">
-                How much do you want to deposit?
+              <label className="text-sm text-muted-foreground mb-2.5 block">
+                How much {xSymbol} do you want to deposit?
               </label>
-              <Input
-                type="number"
-                placeholder="0.00"
-                value={depositAmount}
-                onChange={(e) => setDepositAmount(e.target.value)}
-                className="h-12 text-lg"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Available: 1,250.00 xSPY
+              <div className="relative">
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="0"
+                  value={depositAmount}
+                  onChange={(e) =>
+                    setDepositAmount(e.target.value.replace(/[^0-9.]/g, ""))
+                  }
+                  className="w-full rounded-xl border border-border/50 bg-muted/30 px-5 py-4 text-3xl font-semibold font-mono outline-none pr-24 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-shadow"
+                />
+                <span className="absolute right-5 top-1/2 -translate-y-1/2 text-sm font-semibold text-muted-foreground">
+                  {xSymbol}
+                </span>
+              </div>
+              <p className="text-sm text-muted-foreground mt-2">
+                Available: 1,250.00 {xSymbol}
               </p>
             </div>
             <Button
-              className="w-full h-11 bg-primary text-primary-foreground hover:bg-primary/80 font-medium text-sm"
+              className="w-full h-14 rounded-xl bg-primary text-lg font-semibold text-primary-foreground hover:bg-primary/80"
               disabled={depositNum <= 0}
             >
               Deposit
@@ -458,34 +661,44 @@ function GrandmaVault() {
         </Card>
       </motion.div>
 
-      {/* Take Money Out */}
-      <motion.div {...fadeUp} transition={{ delay: 0.15 }}>
+      {/* Withdraw */}
+      <motion.div {...fadeUp} transition={{ delay: 0.18 }}>
         <Card>
-          <CardHeader className="px-5 pt-5 pb-3">
-            <CardTitle className="text-base font-medium flex items-center gap-2">
-              <ArrowUpFromLine className="size-5 text-muted-foreground" />
+          <CardHeader className="px-5 pt-5 pb-2">
+            <CardTitle className="text-base font-semibold flex items-center gap-3">
+              <div className="size-9 rounded-full bg-muted flex items-center justify-center">
+                <ArrowUpFromLine className="size-4 text-muted-foreground" />
+              </div>
               Take Money Out
             </CardTitle>
           </CardHeader>
-          <CardContent className="px-5 pb-5 pt-0 space-y-3">
+          <CardContent className="px-5 pb-5 pt-2 space-y-4">
             <div>
-              <label className="text-sm text-muted-foreground mb-1.5 block">
-                How much do you want to withdraw?
+              <label className="text-sm text-muted-foreground mb-2.5 block">
+                How much {xSymbol} do you want to withdraw?
               </label>
-              <Input
-                type="number"
-                placeholder="0.00"
-                value={withdrawAmount}
-                onChange={(e) => setWithdrawAmount(e.target.value)}
-                className="h-12 text-lg"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                In vault: 625.00
+              <div className="relative">
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="0"
+                  value={withdrawAmount}
+                  onChange={(e) =>
+                    setWithdrawAmount(e.target.value.replace(/[^0-9.]/g, ""))
+                  }
+                  className="w-full rounded-xl border border-border/50 bg-muted/30 px-5 py-4 text-3xl font-semibold font-mono outline-none pr-24 focus:border-foreground/20 focus:ring-2 focus:ring-foreground/5 transition-shadow"
+                />
+                <span className="absolute right-5 top-1/2 -translate-y-1/2 text-sm font-semibold text-muted-foreground">
+                  {xSymbol}
+                </span>
+              </div>
+              <p className="text-sm text-muted-foreground mt-2">
+                In vault: 625.00 {xSymbol}
               </p>
             </div>
             <Button
               variant="outline"
-              className="w-full h-11 font-medium text-sm"
+              className="w-full h-14 rounded-xl text-lg font-semibold"
               disabled={withdrawNum <= 0}
             >
               Withdraw
@@ -495,23 +708,75 @@ function GrandmaVault() {
       </motion.div>
 
       {/* Earnings */}
-      <motion.div {...fadeUp} transition={{ delay: 0.2 }}>
+      <motion.div {...fadeUp} transition={{ delay: 0.24 }}>
         <Card className="border-primary/20">
-          <CardContent className="p-5 text-center space-y-3">
-            <Gift className="size-8 text-primary mx-auto" />
+          <CardContent className="p-6 text-center space-y-4">
+            <Gift className="size-10 text-primary mx-auto" />
             <div>
-              <p className="text-sm text-muted-foreground">Your Earnings</p>
-              <p className="text-3xl font-semibold text-primary font-mono tracking-tight mt-1">
+              <p className="text-sm text-muted-foreground">
+                Earnings Ready to Collect
+              </p>
+              <p className="text-4xl font-semibold text-primary font-mono tracking-tight mt-1">
                 $8.22
               </p>
             </div>
-            <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/80 font-medium">
-              <Gift className="size-4 mr-2" />
+            <Button className="w-full h-14 rounded-xl bg-primary text-lg font-semibold text-primary-foreground hover:bg-primary/80">
+              <Gift className="size-5 mr-2.5" />
               Collect Earnings
             </Button>
             <p className="text-xs text-muted-foreground">
               Next payment expected: Apr 15, 2026
             </p>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* How it works - at the bottom */}
+      <motion.div {...fadeUp} transition={{ delay: 0.3 }}>
+        <Card>
+          <CardHeader className="px-5 pt-5 pb-2">
+            <CardTitle className="text-sm font-medium">How It Works</CardTitle>
+          </CardHeader>
+          <CardContent className="px-5 pb-5 pt-0">
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                {
+                  n: "1",
+                  title: "Put money in",
+                  desc: "Deposit your stock tokens",
+                },
+                {
+                  n: "2",
+                  title: "Vault splits it",
+                  desc: "Get Income + Price tokens",
+                },
+                {
+                  n: "3",
+                  title: "Earn payments",
+                  desc: "Income token pays regularly",
+                },
+                {
+                  n: "4",
+                  title: "Take money out",
+                  desc: "Return both tokens to withdraw",
+                },
+              ].map((s) => (
+                <div
+                  key={s.n}
+                  className="rounded-xl bg-muted/30 p-4 border border-border/50"
+                >
+                  <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 mb-2.5">
+                    <span className="text-xs font-bold text-primary">
+                      {s.n}
+                    </span>
+                  </div>
+                  <p className="text-sm font-semibold">{s.title}</p>
+                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                    {s.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </motion.div>

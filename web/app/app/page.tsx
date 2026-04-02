@@ -50,10 +50,10 @@ const priceData = Array.from({ length: 30 }, (_, i) => {
 
 // Mock allocation
 const allocation = [
-  { name: "xSPY", value: 45, color: "#c8ff00" },
-  { name: "xdSPY", value: 30, color: "#a3cc00" },
-  { name: "xpSPY", value: 15, color: "#7a9900" },
-  { name: "USDC", value: 10, color: "#526600" },
+  { name: "xSPY", value: 45, color: "#4d7a00" },
+  { name: "xdSPY", value: 30, color: "#5c9200" },
+  { name: "xpSPY", value: 15, color: "#6baa00" },
+  { name: "USDC", value: 10, color: "#8fd400" },
 ];
 
 // Mock recent activity
@@ -142,10 +142,10 @@ function ExpertDashboard() {
     <div className="p-4 md:p-6 space-y-6 max-w-7xl mx-auto">
       {/* Welcome */}
       <motion.div {...fadeUp} transition={{ delay: 0 }}>
-        <h1 className="font-[family-name:var(--font-safira)] text-2xl md:text-3xl tracking-tight">
+        <h1 className="font-[family-name:var(--font-safira)] text-4xl md:text-5xl tracking-tight">
           Welcome back
         </h1>
-        <p className="text-muted-foreground text-sm mt-1">
+        <p className="text-muted-foreground text-base mt-2">
           Your portfolio overview and market snapshot.
         </p>
       </motion.div>
@@ -158,7 +158,7 @@ function ExpertDashboard() {
             {...fadeUp}
             transition={{ delay: 0.05 * (i + 1) }}
           >
-            <Card className="hover:border-[#c8ff00]/20 transition-colors">
+            <Card className="hover:border-primary/20 transition-colors">
               <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 pt-4">
                 <span className="text-xs text-muted-foreground font-medium">
                   {stat.label}
@@ -171,7 +171,7 @@ function ExpertDashboard() {
                 </div>
                 <div className="flex items-center gap-1 mt-1">
                   {stat.isBadge ? (
-                    <Badge className="bg-[#c8ff00]/10 text-[#c8ff00] border-0 text-[10px]">
+                    <Badge className="bg-primary/10 text-primary border-0 text-[10px]">
                       {stat.change}
                     </Badge>
                   ) : (
@@ -226,12 +226,12 @@ function ExpertDashboard() {
                       >
                         <stop
                           offset="0%"
-                          stopColor="#c8ff00"
+                          stopColor="#4d7a00"
                           stopOpacity={0.3}
                         />
                         <stop
                           offset="100%"
-                          stopColor="#c8ff00"
+                          stopColor="#4d7a00"
                           stopOpacity={0}
                         />
                       </linearGradient>
@@ -264,7 +264,7 @@ function ExpertDashboard() {
                     <Area
                       type="monotone"
                       dataKey="price"
-                      stroke="#c8ff00"
+                      stroke="#4d7a00"
                       strokeWidth={2}
                       fill="url(#limeGradient)"
                     />
@@ -392,17 +392,17 @@ function GrandmaDashboard() {
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-2xl mx-auto">
       <motion.div {...fadeUp}>
-        <h1 className="font-[family-name:var(--font-safira)] text-2xl md:text-3xl tracking-tight">
+        <h1 className="font-[family-name:var(--font-safira)] text-4xl md:text-5xl tracking-tight">
           Welcome back!
         </h1>
-        <p className="text-muted-foreground text-sm mt-1">
+        <p className="text-muted-foreground text-base mt-2">
           Here is how your money is doing.
         </p>
       </motion.div>
 
       {/* Big portfolio value card */}
       <motion.div {...fadeUp} transition={{ delay: 0.05 }}>
-        <Card className="border-[#c8ff00]/20">
+        <Card className="border-primary/20">
           <CardContent className="p-6 text-center">
             <p className="text-sm text-muted-foreground mb-2">Your Total Balance</p>
             <p className="text-4xl font-semibold tracking-tight">{totalValue}</p>
@@ -432,8 +432,8 @@ function GrandmaDashboard() {
                 <AreaChart data={priceData}>
                   <defs>
                     <linearGradient id="simpleGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#c8ff00" stopOpacity={0.3} />
-                      <stop offset="100%" stopColor="#c8ff00" stopOpacity={0} />
+                      <stop offset="0%" stopColor="#4d7a00" stopOpacity={0.3} />
+                      <stop offset="100%" stopColor="#4d7a00" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <XAxis
@@ -454,7 +454,7 @@ function GrandmaDashboard() {
                   <Area
                     type="monotone"
                     dataKey="price"
-                    stroke="#c8ff00"
+                    stroke="#4d7a00"
                     strokeWidth={2}
                     fill="url(#simpleGrad)"
                   />
@@ -468,29 +468,29 @@ function GrandmaDashboard() {
       {/* Three big action buttons */}
       <motion.div {...fadeUp} transition={{ delay: 0.15 }} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Link href="/app/vault" className="block">
-          <Card className="hover:border-[#c8ff00]/30 transition-colors cursor-pointer h-full">
+          <Card className="hover:border-primary/30 transition-colors cursor-pointer h-full">
             <CardContent className="p-6 flex flex-col items-center text-center gap-3">
-              <div className="size-12 rounded-full bg-[#c8ff00]/10 flex items-center justify-center">
-                <ArrowDownToLine className="size-6 text-[#c8ff00]" />
+              <div className="size-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <ArrowDownToLine className="size-6 text-primary" />
               </div>
               <p className="text-sm font-medium">Put Money In</p>
             </CardContent>
           </Card>
         </Link>
         <Link href="/app/vault" className="block">
-          <Card className="hover:border-[#c8ff00]/30 transition-colors cursor-pointer h-full">
+          <Card className="hover:border-primary/30 transition-colors cursor-pointer h-full">
             <CardContent className="p-6 flex flex-col items-center text-center gap-3">
-              <div className="size-12 rounded-full bg-[#c8ff00]/10 flex items-center justify-center">
-                <ArrowUpFromLine className="size-6 text-[#c8ff00]" />
+              <div className="size-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <ArrowUpFromLine className="size-6 text-primary" />
               </div>
               <p className="text-sm font-medium">Take Money Out</p>
             </CardContent>
           </Card>
         </Link>
-        <Card className="hover:border-[#c8ff00]/30 transition-colors cursor-pointer">
+        <Card className="hover:border-primary/30 transition-colors cursor-pointer">
           <CardContent className="p-6 flex flex-col items-center text-center gap-3">
-            <div className="size-12 rounded-full bg-[#c8ff00]/10 flex items-center justify-center">
-              <Gift className="size-6 text-[#c8ff00]" />
+            <div className="size-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <Gift className="size-6 text-primary" />
             </div>
             <p className="text-sm font-medium">Collect Earnings</p>
             <p className="text-xs text-muted-foreground">$8.22 available</p>
