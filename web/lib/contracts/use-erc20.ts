@@ -32,10 +32,21 @@ export async function ensureApproval(
   publicClient: PublicClient,
   walletClient: WalletClient,
 ): Promise<void> {
-  const token = getErc20Contract(tokenAddress, publicClient, walletClient);
-  const current = await token.read.allowance([account, spender]);
+  const current = await publicClient.readContract({
+    address: tokenAddress,
+    abi: ERC20_ABI,
+    functionName: "allowance",
+    args: [account, spender],
+  });
   if (current < amount) {
-    const hash = await token.write.approve([spender, amount], { account });
+    const hash = await walletClient.writeContract({
+      address: tokenAddress,
+      abi: ERC20_ABI,
+      functionName: "approve",
+      args: [spender, amount],
+      account,
+      chain: walletClient.chain,
+    });
     await publicClient.waitForTransactionReceipt({ hash });
   }
 }
@@ -47,7 +58,7 @@ export function useErc20Balance(
   decimals: number = 18,
 ) {
   const [balance, setBalance] = useState<string>("0");
-  const [rawBalance, setRawBalance] = useState<bigint>(0n);
+  const [rawBalance, setRawBalance] = useState<bigint>(BigInt(0));
   const [loading, setLoading] = useState(false);
 
   const refresh = useCallback(async () => {
