@@ -13,6 +13,7 @@ import {
 import { inkSepolia, sepolia } from "viem/chains";
 import { useContractMode } from "@/lib/contract-mode-context";
 import { getContractConfig, getAssetBySymbol } from "./addresses";
+import { getRpcUrl } from "./config";
 import { VAULT_ABI, ERC20_ABI } from "./abis";
 
 function getChainFromWallet(wallet: { chainId: string }) {
@@ -64,10 +65,10 @@ export function useVault() {
     if (!wallet) throw new Error("No wallet connected");
 
     const { chain, chainId } = getChainFromWallet(wallet);
-    const cfg = getContractConfig(chainId, isMock ? "mock" : "prod");
+    const cfg = getContractConfig(chainId, isMock);
     const provider = await wallet.getEthereumProvider();
 
-    const publicClient = createPublicClient({ chain, transport: http() });
+    const publicClient = createPublicClient({ chain, transport: http(getRpcUrl(chainId)) });
     const walletClient = createWalletClient({
       chain,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

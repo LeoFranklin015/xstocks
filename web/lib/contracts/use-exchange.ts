@@ -23,14 +23,14 @@ function getChain(chainId: number) {
 
 export function useExchange() {
   const { wallets } = useWallets();
-  const { contractMode } = useContractMode();
+  const { isMock } = useContractMode();
 
   const wallet = wallets[0] ?? null;
   const account = (wallet?.address ?? null) as Address | null;
   const chainId = wallet
     ? parseInt(wallet.chainId.split(":")[1], 10)
     : null;
-  const cfg = chainId != null ? getContractConfig(chainId, contractMode) : null;
+  const cfg = chainId != null ? getContractConfig(chainId, isMock) : null;
   const publicClient = chainId != null ? getPublicClient(getChain(chainId)) : null;
 
   const openLong = useCallback(

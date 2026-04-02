@@ -482,6 +482,10 @@ function AppLayoutInner({ children }: { children: React.ReactNode }) {
             </span>
           </div>
 
+          <div className="shrink-0 w-[100px]">
+            <ContractModeToggle />
+          </div>
+
           <MarketTickerMarquee />
         </header>
 

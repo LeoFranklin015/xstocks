@@ -7,13 +7,13 @@ import {
   type WalletClient,
   type Chain,
 } from "viem";
-import { DEFAULT_CHAIN } from "./config";
+import { DEFAULT_CHAIN, getRpcUrl } from "./config";
 
 // Public client for read-only calls (no wallet needed)
 export function getPublicClient(chain: Chain = DEFAULT_CHAIN): PublicClient {
   return createPublicClient({
     chain,
-    transport: http(),
+    transport: http(getRpcUrl(chain.id)),
   });
 }
 
